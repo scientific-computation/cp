@@ -14,7 +14,7 @@ window.main = function() {
     var v0         = 0.0;
     var tMin       = 0;
     var tMax       = 100;
-    var tPrecision = 0.1;
+    var tPrecision = 0.001;
 
     /* build the trace container (euler method) */
     var traceEulerMethod = {
@@ -49,23 +49,30 @@ window.main = function() {
     };
 
     /* calculate the euler equation */
-    traceEulerMethod.x.push(0);
-    traceEulerMethod.y.push(0);
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaEulerSpringPendulumDamped(m, k, gamma, values, tPrecision)
+        traceEulerMethod.x.push(t);
+        traceEulerMethod.y.push(values.x);
+    }
 
     /* calculate the runge kutta equation (2. order) */
-    traceRungeKuttaMethodOfSecondOrder.x.push(0);
-    traceRungeKuttaMethodOfSecondOrder.y.push(0);
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        traceRungeKuttaMethodOfSecondOrder.x.push(t);
+        traceRungeKuttaMethodOfSecondOrder.y.push(0);
+    }
 
     /* calculate the runge kutta equation (4. order) */
-    traceRungeKuttaMethodOfFourthOrder.x.push(0);
-    traceRungeKuttaMethodOfFourthOrder.y.push(0);
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        traceRungeKuttaMethodOfFourthOrder.x.push(t);
+        traceRungeKuttaMethodOfFourthOrder.y.push(0);
+    }
 
     /* calculate the analytic equation */
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
         traceAnalytic.x.push(t);
         traceAnalytic.y.push(equations.analyticSpringPendulumDamped(m, k, gamma, x0, v0, t));
     }
-
 
     /* initialize the output */
     var data = [traceEulerMethod, traceRungeKuttaMethodOfSecondOrder, traceRungeKuttaMethodOfFourthOrder, traceAnalytic];
