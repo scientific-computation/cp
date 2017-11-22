@@ -14,7 +14,7 @@ window.main = function() {
     var v0         = 0.0;
     var tMin       = 0;
     var tMax       = 100;
-    var tPrecision = 0.001;
+    var tPrecision = 0.01;
 
     /* build the trace container (euler method) */
     var traceEulerMethod = {

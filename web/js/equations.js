@@ -21,7 +21,7 @@ window.equations = {
 
         /* equation: see doc bloc */
         var x1 = x0 * Math.exp(-delta * t) * Math.cos(sqareRootOmegaDelta * t);
-        var x2 = (v0 + x0 * delta) / sqareRootOmegaDelta * Math.sin(sqareRootOmegaDelta * t);
+        var x2 = (v0 + x0 * delta) / sqareRootOmegaDelta * Math.exp(-delta * t) * Math.sin(sqareRootOmegaDelta * t);
 
         /* return the analytic solution */
         return x1 + x2;
