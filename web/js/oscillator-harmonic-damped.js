@@ -7,21 +7,27 @@
 window.main = function() {
 
     /* some initial values */
-    var m          = 1.0;
-    var k          = 1.0;
-    var gamma      = 0.1;
-    var x0         = 10.0;
-    var v0         = 0.0;
-    var tMin       = 0;
-    var tMax       = 100;
-    var tPrecision = 0.01;
+    var m            = 1.0;
+    var k            = 1.0;
+    var gamma        = 0.1;
+    var x0           = 10.0;
+    var v0           = 0.0;
+    var tMin         = 0;
+    var tMax         = 100;
+    var tPrecision   = 0.05;
+    var traceOpacity = 0.5;
+    var traceWidth   = 1;
 
     /* build the trace container (euler method) */
     var traceEulerMethod = {
         x: [],
         y: [],
         name: 'Euler method',
-        type: 'scatter'
+        type: 'scatter',
+        opacity: traceOpacity,
+        line: {
+            width: traceWidth
+        }
     };
 
     /* build the trace container (runge kutta method) */
@@ -29,7 +35,11 @@ window.main = function() {
         x: [],
         y: [],
         name: 'Runge-Kutta method of 2. order',
-        type: 'scatter'
+        type: 'scatter',
+        opacity: traceOpacity,
+        line: {
+            width: traceWidth
+        }
     };
 
     /* build the trace container (runge kutta method - 4. order) */
@@ -37,7 +47,11 @@ window.main = function() {
         x: [],
         y: [],
         name: 'Runge-Kutta method of 4. order',
-        type: 'scatter'
+        type: 'scatter',
+        opacity: traceOpacity,
+        line: {
+            width: traceWidth
+        }
     };
 
     /* build the trace container (analytic solution) */
@@ -45,7 +59,11 @@ window.main = function() {
         x: [],
         y: [],
         name: 'Analytic solution',
-        type: 'scatter'
+        type: 'scatter',
+        opacity: traceOpacity,
+        line: {
+            width: traceWidth
+        }
     };
 
     /* calculate the euler equation */
