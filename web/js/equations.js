@@ -38,5 +38,29 @@ window.equations = {
             v: values.v - deltaT * (gamma / m * values.v + k / m * values.x),
             x: values.x + deltaT * values.v
         };
+    },
+
+    /**
+     * This is the runge kutta method (2. order) version of analyticSpringPendulumDamped.
+     *
+     * @author  Björn Hempel <bjoern@hempel.li>
+     * @version 1.0 (2017-11-25)
+     */
+    deltaRungeKuttaSpringPendulumDamped: function(m, k, gamma, values, deltaT) {
+        /* m' */
+        var si_ = -(gamma / m * values.v + k / m * values.x);
+        /* m */
+        var si  = values.v;
+
+        var v = values.v + deltaT * si_;
+        var x = values.x + deltaT * si;
+
+        var si1_ = -(gamma / m * v + k / m * x);
+        var si1  = v;
+
+        return {
+            v: values.v + deltaT * .5 * (si_ + si1_),
+            x: values.x + deltaT * .5 * (si  + si1)
+        };
     }
 };

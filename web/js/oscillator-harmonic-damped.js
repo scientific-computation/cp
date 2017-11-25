@@ -15,7 +15,7 @@ window.main = function() {
     var tMin         = 0;
     var tMax         = 100;
     var tPrecision   = 0.05;
-    var traceOpacity = 0.5;
+    var traceOpacity = 1.0;
     var traceWidth   = 1;
 
     /* build the trace container (euler method) */
@@ -69,15 +69,17 @@ window.main = function() {
     /* calculate the euler equation */
     var values = {x: x0, v: v0};
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
-        values = equations.deltaEulerSpringPendulumDamped(m, k, gamma, values, tPrecision)
+        values = equations.deltaEulerSpringPendulumDamped(m, k, gamma, values, tPrecision);
         traceEulerMethod.x.push(t);
         traceEulerMethod.y.push(values.x);
     }
 
     /* calculate the runge kutta equation (2. order) */
+    var values = {x: x0, v: v0};
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaRungeKuttaSpringPendulumDamped(m, k, gamma, values, tPrecision);
         traceRungeKuttaMethodOfSecondOrder.x.push(t);
-        traceRungeKuttaMethodOfSecondOrder.y.push(0);
+        traceRungeKuttaMethodOfSecondOrder.y.push(values.x);
     }
 
     /* calculate the runge kutta equation (4. order) */
