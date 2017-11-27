@@ -16,5 +16,10 @@
             <p><strong>equation of motion:</strong> m·ẍ(t) + γ·ẋ(t) + k·x(t) = 0</p>
         </div>
         <div id="graph-oscillator-harmonic-damped" class="graph"></div>
+        <div class="content">
+            <h2>Error</h2>
+            <p>Error between numeric and analytic calculations.</p>
+        </div>
+        <div id="graph-oscillator-harmonic-damped-error" class="graph"></div>
     </body>
 </html>

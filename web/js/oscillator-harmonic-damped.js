@@ -14,7 +14,7 @@ window.main = function() {
     var v0           = 0.0;
     var tMin         = 0;
     var tMax         = 100;
-    var tPrecision   = 0.05;
+    var tPrecision   = 0.005;
     var traceOpacity = 1.0;
     var traceWidth   = 1;
 
@@ -29,6 +29,7 @@ window.main = function() {
             width: traceWidth
         }
     };
+    var traceEulerMethodError = jQuery.extend(true, {}, traceEulerMethod);
 
     /* build the trace container (runge kutta method) */
     var traceRungeKuttaMethodOfSecondOrder = {
@@ -41,6 +42,7 @@ window.main = function() {
             width: traceWidth
         }
     };
+    var traceRungeKuttaMethodOfSecondOrderError = jQuery.extend(true, {}, traceRungeKuttaMethodOfSecondOrder);
 
     /* build the trace container (runge kutta method - 4. order) */
     var traceRungeKuttaMethodOfFourthOrder = {
@@ -53,6 +55,7 @@ window.main = function() {
             width: traceWidth
         }
     };
+    var traceRungeKuttaMethodOfFourthOrderError = jQuery.extend(true, {}, traceRungeKuttaMethodOfFourthOrder);
 
     /* build the trace container (analytic solution) */
     var traceAnalytic = {
@@ -65,6 +68,7 @@ window.main = function() {
             width: traceWidth
         }
     };
+    var traceAnalyticError = jQuery.extend(true, {}, traceAnalytic);
 
     /* calculate the euler equation */
     var values = {x: x0, v: v0};
@@ -85,7 +89,7 @@ window.main = function() {
     /* calculate the runge kutta equation (4. order) */
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
         traceRungeKuttaMethodOfFourthOrder.x.push(t);
-        traceRungeKuttaMethodOfFourthOrder.y.push(0);
+        traceRungeKuttaMethodOfFourthOrder.y.push(equations.analyticSpringPendulumDamped(m, k, gamma, x0, v0, t));
     }
 
     /* calculate the analytic equation */
@@ -111,6 +115,47 @@ window.main = function() {
     Plotly.newPlot(
         'graph-oscillator-harmonic-damped',
         data,
+        layout,
+        {
+            displayModeBar: false,
+            scrollZoom: false,
+            editable: false,
+            staticPlot: true
+        }
+    );
+
+    /* calculates the errors (deviation) */
+    for (var t = 0; t < traceAnalytic.x.length; t++) {
+        traceEulerMethodError.x.push(traceEulerMethod.x[t]);
+        traceEulerMethodError.y.push(traceAnalytic.y[t] - traceEulerMethod.y[t]);
+
+        traceRungeKuttaMethodOfSecondOrderError.x.push(traceRungeKuttaMethodOfSecondOrder.x[t]);
+        traceRungeKuttaMethodOfSecondOrderError.y.push(traceAnalytic.y[t] - traceRungeKuttaMethodOfSecondOrder.y[t]);
+
+        traceRungeKuttaMethodOfFourthOrderError.x.push(traceRungeKuttaMethodOfFourthOrder.x[t]);
+        traceRungeKuttaMethodOfFourthOrderError.y.push(traceAnalytic.y[t] - traceRungeKuttaMethodOfFourthOrder.y[t]);
+
+        traceAnalyticError.x.push(traceAnalytic.x[t]);
+        traceAnalyticError.y.push(traceAnalytic.y[t] - traceAnalytic.y[t]);
+    }
+
+    /* initialize the error output */
+    var dataError = [traceEulerMethodError, traceRungeKuttaMethodOfSecondOrderError, traceRungeKuttaMethodOfFourthOrderError, traceAnalyticError];
+
+    var layout = {
+        title: '',
+        showlegend: true,
+        xaxis: {
+            title: 'time [t]'
+        },
+        yaxis: {
+            title: 'error analytic - numeric'
+        }
+    };
+
+    Plotly.newPlot(
+        'graph-oscillator-harmonic-damped-error',
+        dataError,
         layout,
         {
             displayModeBar: false,
