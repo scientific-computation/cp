@@ -18,6 +18,30 @@ window.main = function() {
     var traceOpacity = 1.0;
     var traceWidth   = 1;
 
+    /* layout graph */
+    var layout = {
+        title: '',
+        showlegend: true,
+        xaxis: {
+            title: 'time [t]'
+        },
+        yaxis: {
+            title: 'amplitude [x(t)]'
+        }
+    };
+
+    /* layout error graph */
+    var layoutError = {
+        title: '',
+        showlegend: true,
+        xaxis: {
+            title: 'time [t]'
+        },
+        yaxis: {
+            title: 'error analytic - numeric'
+        }
+    };
+
     /* build the trace container (euler method) */
     var traceEulerMethod = {
         x: [],
@@ -70,7 +94,7 @@ window.main = function() {
     };
     var traceAnalyticError = jQuery.extend(true, {}, traceAnalytic);
 
-    /* calculate the euler equation */
+    /* calculate the different graphs */
     var values = {x: x0, v: v0};
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
         values = equations.deltaEulerSpringPendulumDamped(m, k, gamma, values, tPrecision);
@@ -81,15 +105,17 @@ window.main = function() {
     /* calculate the runge kutta equation (2. order) */
     var values = {x: x0, v: v0};
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
-        values = equations.deltaRungeKuttaSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        values = equations.deltaRungeKuttaOfSecondOrderSpringPendulumDamped(m, k, gamma, values, tPrecision);
         traceRungeKuttaMethodOfSecondOrder.x.push(t);
         traceRungeKuttaMethodOfSecondOrder.y.push(values.x);
     }
 
     /* calculate the runge kutta equation (4. order) */
+    var values = {x: x0, v: v0};
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaRungeKuttaOfFourthOrderSpringPendulumDamped(m, k, gamma, values, tPrecision);
         traceRungeKuttaMethodOfFourthOrder.x.push(t);
-        traceRungeKuttaMethodOfFourthOrder.y.push(equations.analyticSpringPendulumDamped(m, k, gamma, x0, v0, t));
+        traceRungeKuttaMethodOfFourthOrder.y.push(values.x);
     }
 
     /* calculate the analytic equation */
@@ -97,32 +123,6 @@ window.main = function() {
         traceAnalytic.x.push(t);
         traceAnalytic.y.push(equations.analyticSpringPendulumDamped(m, k, gamma, x0, v0, t));
     }
-
-    /* initialize the output */
-    var data = [traceEulerMethod, traceRungeKuttaMethodOfSecondOrder, traceRungeKuttaMethodOfFourthOrder, traceAnalytic];
-
-    var layout = {
-        title: '',
-        showlegend: true,
-        xaxis: {
-            title: 'time [t]'
-        },
-        yaxis: {
-            title: 'amplitude [x(t)]'
-        }
-    };
-
-    Plotly.newPlot(
-        'graph-oscillator-harmonic-damped',
-        data,
-        layout,
-        {
-            displayModeBar: false,
-            scrollZoom: false,
-            editable: false,
-            staticPlot: true
-        }
-    );
 
     /* calculates the errors (deviation) */
     for (var t = 0; t < traceAnalytic.x.length; t++) {
@@ -139,23 +139,14 @@ window.main = function() {
         traceAnalyticError.y.push(traceAnalytic.y[t] - traceAnalytic.y[t]);
     }
 
-    /* initialize the error output */
+    /* initialize the data output (result and error) */
     var dataError = [traceEulerMethodError, traceRungeKuttaMethodOfSecondOrderError, traceRungeKuttaMethodOfFourthOrderError, traceAnalyticError];
+    var data = [traceEulerMethod, traceRungeKuttaMethodOfSecondOrder, traceRungeKuttaMethodOfFourthOrder, traceAnalytic];
 
-    var layout = {
-        title: '',
-        showlegend: true,
-        xaxis: {
-            title: 'time [t]'
-        },
-        yaxis: {
-            title: 'error analytic - numeric'
-        }
-    };
-
+    /* build the graph and error graph */
     Plotly.newPlot(
-        'graph-oscillator-harmonic-damped-error',
-        dataError,
+        'graph-oscillator-harmonic-damped',
+        data,
         layout,
         {
             displayModeBar: false,
@@ -164,5 +155,15 @@ window.main = function() {
             staticPlot: true
         }
     );
+    Plotly.newPlot(
+        'graph-oscillator-harmonic-damped-error',
+        dataError,
+        layoutError,
+        {
+            displayModeBar: false,
+            scrollZoom: false,
+            editable: false,
+            staticPlot: true
+        }
+    );
 };
-
