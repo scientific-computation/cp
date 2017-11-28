@@ -1,7 +1,7 @@
 /**
  * Calculates a damped harmonic oscillator.
  *
- * @version 1.0 (2017-11-22)
+ * @version 1.0 (2017-11-28)
  * @author  Björn Hempel <bjoern@hempel.li>
  */
 window.main = function() {
@@ -14,7 +14,7 @@ window.main = function() {
     var v0           = 0.0;
     var tMin         = 0;
     var tMax         = 100;
-    var tPrecision   = 0.005;
+    var tPrecision   = 0.05;
     var traceOpacity = 1.0;
     var traceWidth   = 1;
 
@@ -26,7 +26,8 @@ window.main = function() {
             title: 'time [t]'
         },
         yaxis: {
-            title: 'amplitude [x(t)]'
+            title: 'amplitude [x(t)]',
+            range: [-11, 11]
         }
     };
 
@@ -42,6 +43,47 @@ window.main = function() {
         }
     };
 
+    /* layout phase space */
+    var layoutPhaseSpace = {
+        title: '',
+        showlegend: true,
+        xaxis: {
+            title: 'position [x]',
+            range: [-11, 11]
+        },
+        yaxis: {
+            title: 'velocity [v(t)]',
+            range: [-11, 11]
+        }
+    };
+
+    /* layout energy */
+    var layoutEnergy = {
+        title: '',
+        showlegend: true,
+        xaxis: {
+            title: 'time [t]'
+        },
+        yaxis: {
+            title: 'energy [E(t)]',
+            range: [0, 50]
+        }
+    };
+
+    /* layout energy without attenuation */
+    var layoutEnergyWithoutAttenuation = {
+        title: '',
+        showlegend: true,
+        xaxis: {
+            title: 'time [t]',
+            range: [0, 10]
+        },
+        yaxis: {
+            title: 'energy [E(t)]',
+            range: [40, 100]
+        }
+    };
+
     /* build the trace container (euler method) */
     var traceEulerMethod = {
         x: [],
@@ -54,6 +96,9 @@ window.main = function() {
         }
     };
     var traceEulerMethodError = jQuery.extend(true, {}, traceEulerMethod);
+    var traceEulerMethodPhaseSpace = jQuery.extend(true, {}, traceEulerMethod);
+    var traceEulerMethodEnergy = jQuery.extend(true, {}, traceEulerMethod);
+    var traceEulerMethodEnergyWithoutAttenuation = jQuery.extend(true, {}, traceEulerMethod);
 
     /* build the trace container (runge kutta method) */
     var traceRungeKuttaMethodOfSecondOrder = {
@@ -63,10 +108,13 @@ window.main = function() {
         type: 'scatter',
         opacity: traceOpacity,
         line: {
-            width: traceWidth
+            width: traceWidth + 1
         }
     };
     var traceRungeKuttaMethodOfSecondOrderError = jQuery.extend(true, {}, traceRungeKuttaMethodOfSecondOrder);
+    var traceRungeKuttaMethodOfSecondOrderPhaseSpace = jQuery.extend(true, {}, traceRungeKuttaMethodOfSecondOrder);
+    var traceRungeKuttaMethodOfSecondOrderEnergy = jQuery.extend(true, {}, traceRungeKuttaMethodOfSecondOrder);
+    var traceRungeKuttaMethodOfSecondOrderEnergyWithoutAttenuation = jQuery.extend(true, {}, traceRungeKuttaMethodOfSecondOrder);
 
     /* build the trace container (runge kutta method - 4. order) */
     var traceRungeKuttaMethodOfFourthOrder = {
@@ -80,6 +128,9 @@ window.main = function() {
         }
     };
     var traceRungeKuttaMethodOfFourthOrderError = jQuery.extend(true, {}, traceRungeKuttaMethodOfFourthOrder);
+    var traceRungeKuttaMethodOfFourthOrderPhaseSpace = jQuery.extend(true, {}, traceRungeKuttaMethodOfFourthOrder);
+    var traceRungeKuttaMethodOfFourthOrderEnergy = jQuery.extend(true, {}, traceRungeKuttaMethodOfFourthOrder);
+    var traceRungeKuttaMethodOfFourthOrderEnergyWithoutAttenuation = jQuery.extend(true, {}, traceRungeKuttaMethodOfFourthOrder);
 
     /* build the trace container (analytic solution) */
     var traceAnalytic = {
@@ -93,8 +144,11 @@ window.main = function() {
         }
     };
     var traceAnalyticError = jQuery.extend(true, {}, traceAnalytic);
+    var traceAnalyticPhaseSpace = jQuery.extend(true, {}, traceAnalytic);
+    var traceAnalyticEnergy = jQuery.extend(true, {}, traceAnalytic);
+    var traceAnalyticEnergyWithoutAttenuation = jQuery.extend(true, {}, traceAnalytic);
 
-    /* calculate the different graphs */
+    /* calculate the euler equation */
     var values = {x: x0, v: v0};
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
         values = equations.deltaEulerSpringPendulumDamped(m, k, gamma, values, tPrecision);
@@ -121,7 +175,105 @@ window.main = function() {
     /* calculate the analytic equation */
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
         traceAnalytic.x.push(t);
-        traceAnalytic.y.push(equations.analyticSpringPendulumDamped(m, k, gamma, x0, v0, t));
+        traceAnalytic.y.push(equations.analyticPositionSpringPendulumDamped(m, k, gamma, x0, v0, t));
+    }
+
+    /* calculate the phase space (euler) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaEulerSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceEulerMethodPhaseSpace.x.push(values.x);
+        traceEulerMethodPhaseSpace.y.push(values.v);
+    }
+
+    /* calculate the runge kutta equation (2. order) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaRungeKuttaOfSecondOrderSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceRungeKuttaMethodOfSecondOrderPhaseSpace.x.push(values.x);
+        traceRungeKuttaMethodOfSecondOrderPhaseSpace.y.push(values.v);
+    }
+
+    /* calculate the runge kutta equation (4. order) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaRungeKuttaOfFourthOrderSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceRungeKuttaMethodOfFourthOrderPhaseSpace.x.push(values.x);
+        traceRungeKuttaMethodOfFourthOrderPhaseSpace.y.push(values.v);
+    }
+
+    /* calculate the analytic equation */
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        traceAnalyticPhaseSpace.x.push(equations.analyticPositionSpringPendulumDamped(m, k, gamma, x0, v0, t));
+        traceAnalyticPhaseSpace.y.push(equations.analyticDerivationSpringPendulumDamped(m, k, gamma, x0, v0, t));
+    }
+
+    /* calculate the energy (euler) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaEulerSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceEulerMethodEnergy.x.push(t);
+        traceEulerMethodEnergy.y.push(equations.energySpringPendulumDamped(k, m, values.x, values.v));
+    }
+
+    /* calculate the energy (runge kutta equation 2. order) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaRungeKuttaOfSecondOrderSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceRungeKuttaMethodOfSecondOrderEnergy.x.push(t);
+        traceRungeKuttaMethodOfSecondOrderEnergy.y.push(equations.energySpringPendulumDamped(k, m, values.x, values.v));
+    }
+
+    /* calculate the energy (runge kutta equation 4. order) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaRungeKuttaOfFourthOrderSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceRungeKuttaMethodOfFourthOrderEnergy.x.push(t);
+        traceRungeKuttaMethodOfFourthOrderEnergy.y.push(equations.energySpringPendulumDamped(k, m, values.x, values.v));
+    }
+
+    /* calculate the energy (analytic equation) */
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        var x = equations.analyticPositionSpringPendulumDamped(m, k, gamma, x0, v0, t);
+        var v = equations.analyticDerivationSpringPendulumDamped(m, k, gamma, x0, v0, t);
+
+        traceAnalyticEnergy.x.push(t);
+        traceAnalyticEnergy.y.push(equations.energySpringPendulumDamped(k, m, x, v));
+    }
+
+    gamma = 0;
+
+    /* calculate the energy (euler) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaEulerSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceEulerMethodEnergyWithoutAttenuation.x.push(t);
+        traceEulerMethodEnergyWithoutAttenuation.y.push(equations.energySpringPendulumDamped(k, m, values.x, values.v));
+    }
+
+    /* calculate the energy (runge kutta equation 2. order) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaRungeKuttaOfSecondOrderSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceRungeKuttaMethodOfSecondOrderEnergyWithoutAttenuation.x.push(t);
+        traceRungeKuttaMethodOfSecondOrderEnergyWithoutAttenuation.y.push(equations.energySpringPendulumDamped(k, m, values.x, values.v));
+    }
+
+    /* calculate the energy (runge kutta equation 4. order) */
+    var values = {x: x0, v: v0};
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        values = equations.deltaRungeKuttaOfFourthOrderSpringPendulumDamped(m, k, gamma, values, tPrecision);
+        traceRungeKuttaMethodOfFourthOrderEnergyWithoutAttenuation.x.push(t);
+        traceRungeKuttaMethodOfFourthOrderEnergyWithoutAttenuation.y.push(equations.energySpringPendulumDamped(k, m, values.x, values.v));
+    }
+
+    /* calculate the energy (analytic equation) */
+    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+        var x = equations.analyticPositionSpringPendulumDamped(m, k, gamma, x0, v0, t);
+        var v = equations.analyticDerivationSpringPendulumDamped(m, k, gamma, x0, v0, t);
+
+        traceAnalyticEnergyWithoutAttenuation.x.push(t);
+        traceAnalyticEnergyWithoutAttenuation.y.push(equations.energySpringPendulumDamped(k, m, x, v));
     }
 
     /* calculates the errors (deviation) */
@@ -140,8 +292,16 @@ window.main = function() {
     }
 
     /* initialize the data output (result and error) */
-    var dataError = [traceEulerMethodError, traceRungeKuttaMethodOfSecondOrderError, traceRungeKuttaMethodOfFourthOrderError, traceAnalyticError];
     var data = [traceEulerMethod, traceRungeKuttaMethodOfSecondOrder, traceRungeKuttaMethodOfFourthOrder, traceAnalytic];
+    var dataError = [traceEulerMethodError, traceRungeKuttaMethodOfSecondOrderError, traceRungeKuttaMethodOfFourthOrderError, traceAnalyticError];
+    var dataPhaseSpace = [traceEulerMethodPhaseSpace, traceRungeKuttaMethodOfSecondOrderPhaseSpace, traceRungeKuttaMethodOfFourthOrderPhaseSpace, traceAnalyticPhaseSpace];
+    var dataEnergy = [traceEulerMethodEnergy, traceRungeKuttaMethodOfSecondOrderEnergy, traceRungeKuttaMethodOfFourthOrderEnergy, traceAnalyticEnergy];
+    var dataEnergyWithoutAttenuation = [
+        traceEulerMethodEnergyWithoutAttenuation,
+        traceRungeKuttaMethodOfSecondOrderEnergyWithoutAttenuation,
+        traceRungeKuttaMethodOfFourthOrderEnergyWithoutAttenuation,
+        traceAnalyticEnergyWithoutAttenuation
+    ];
 
     /* build the graph and error graph */
     Plotly.newPlot(
@@ -156,9 +316,42 @@ window.main = function() {
         }
     );
     Plotly.newPlot(
+        'graph-oscillator-harmonic-damped-phase',
+        dataPhaseSpace,
+        layoutPhaseSpace,
+        {
+            displayModeBar: false,
+            scrollZoom: false,
+            editable: false,
+            staticPlot: true
+        }
+    );
+    Plotly.newPlot(
+        'graph-oscillator-harmonic-damped-energy',
+        dataEnergy,
+        layoutEnergy,
+        {
+            displayModeBar: false,
+            scrollZoom: false,
+            editable: false,
+            staticPlot: true
+        }
+    );
+    Plotly.newPlot(
         'graph-oscillator-harmonic-damped-error',
         dataError,
         layoutError,
+        {
+            displayModeBar: false,
+            scrollZoom: false,
+            editable: false,
+            staticPlot: true
+        }
+    );
+    Plotly.newPlot(
+        'graph-oscillator-harmonic-damped-energy-without-attenuation',
+        dataEnergyWithoutAttenuation,
+        layoutEnergyWithoutAttenuation,
         {
             displayModeBar: false,
             scrollZoom: false,
