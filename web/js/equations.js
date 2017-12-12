@@ -233,6 +233,8 @@ window.equations = {
         return {
             vx: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
             x:  values.x  + 1 / 6 * deltaT * (k1.x  + 2 * k2.x  + 2 * k3.x  + k4.x),
+            vx: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
+            x:  values.x  + 1 / 6 * deltaT * (k1.x  + 2 * k2.x  + 2 * k3.x  + k4.x)
         };
     }
 };

@@ -68,7 +68,12 @@ window.main = function() {
     };
 
     /* calculate the runge kutta equation (4. order) */
-    var values = {x: initialSettings.x0, vx: initialSettings.v0, y: initialSettings.x0, vy: initialSettings.v0};
+    var values = {
+        x:  initialSettings.x0,
+        vx: initialSettings.vx0,
+        y:  initialSettings.y0,
+        vy: initialSettings.vy0
+    };
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
         values = equations.deltaRungeKuttaOfFourthOrderProjectileMotion(values, tPrecision, initialSettings);
         traceRungeKuttaMethodOfFourthOrder.x.push(t);
