@@ -155,4 +155,83 @@ window.equations = {
             x: values.x + 1 / 6 * deltaT * (k1.x + 2 * k2.x + 2 * k3.x + k4.x),
         };
     },
+
+    /**
+     * Analytic equation projectile motion without friction.
+     *
+     * @author  Björn Hempel <bjoern@hempel.li>
+     * @version 1.0 (2017-12-12)
+     */
+    analyticPosition: function(x, initalSettings) {
+        var y = 0;
+
+        y += -initalSettings.g / (2 * Math.pow(initalSettings.v0, 2) * Math.pow(Math.cos(initalSettings.alpha), 2)) * Math.pow(x - initalSettings.x0, 2);
+        y += Math.tan(initalSettings.alpha) * (x - initalSettings.x0);
+        y += initalSettings.y0;
+
+        /* return the analytic solution */
+        return y;
+    },
+
+    /**
+     * Calculates the gradient of given parameters.
+     *
+     * @author  Björn Hempel <bjoern@hempel.li>
+     * @version 1.0 (2017-12-11)
+     */
+    gradientProjectileMotionX: function(m, k, gamma, values) {
+        return {
+            vx: - gamma / m * values.vx - k / m * values.x,
+            x:  values.vx
+        };
+    },
+
+    /**
+     * Calculates the gradient of given parameters.
+     *
+     * @author  Björn Hempel <bjoern@hempel.li>
+     * @version 1.0 (2017-12-11)
+     */
+    gradientProjectileMotionY: function(m, k, gamma, values) {
+        return {
+            vx: - gamma / m * values.vx - k / m * values.x,
+            x:  values.vx
+        };
+    },
+
+    /**
+     * Calculates the runge kutta method (4. order) version of analyticProjectileMotion.
+     *
+     * @author  Björn Hempel <bjoern@hempel.li>
+     * @version 1.0 (2017-11-25)
+     */
+    deltaRungeKuttaOfFourthOrderProjectileMotion: function(m, gamma, values, deltaT) {
+        var k = 1.0;
+
+
+        var k1 = this.gradientProjectileMotionX(m, k, gamma, values);
+
+        var valuesK2 = {
+            vx: values.vx + .5 * deltaT * k1.vx,
+            x:  values.x  + .5 * deltaT * k1.x
+        }
+        var k2 = this.gradientProjectileMotionX(m, k, gamma, valuesK2);
+
+        var valuesK3 = {
+            vx: values.vx + .5 * deltaT * k2.vx,
+            x:  values.x  + .5 * deltaT * k2.x
+        }
+        var k3 = this.gradientProjectileMotionX(m, k, gamma, valuesK3);
+
+        var valuesK4 = {
+            vx: values.vx + deltaT * k3.vx,
+            x:  values.x  + deltaT * k3.x
+        }
+        var k4 = this.gradientProjectileMotionX(m, k, gamma, valuesK4);
+
+        return {
+            vx: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
+            x:  values.x  + 1 / 6 * deltaT * (k1.x  + 2 * k2.x  + 2 * k3.x  + k4.x),
+        };
+    }
 };

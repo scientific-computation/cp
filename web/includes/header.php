@@ -1,6 +1,8 @@
 <!-- load js libraries -->
 <script src="/js/vendor/jquery-3.2.1.min.js"></script>
 <script src="/js/vendor/plotly-1.2.0.min.js"></script>
+<!--script src="/js/vendor/mathjax-2.7.2.min.js"-->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 <script src="/js/equations.js"></script>
 
 <!-- load style sheets -->
