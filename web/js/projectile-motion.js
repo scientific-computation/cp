@@ -36,10 +36,10 @@ window.main = function() {
         title: '',
         showlegend: true,
         xaxis: {
-            title: 'time [t]'
+            title: 'x(t)'
         },
         yaxis: {
-            title: 'amplitude [x(t)]'
+            title: 'y(t)'
         }
     };
 
