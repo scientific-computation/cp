@@ -180,12 +180,11 @@ window.equations = {
      * @version 1.0 (2017-12-11)
      */
     gradientProjectileMotionX: function(values, initialSettings) {
-        var k = 1.0;
+        var vx = - initialSettings.gamma / initialSettings.m * values.vx - 1.0 / initialSettings.m * values.x;
+        var x  = values.vx;
 
-        return {
-            vx: - initialSettings.gamma / initialSettings.m * values.vx - k / initialSettings.m * values.x,
-            x:  values.vx
-        };
+        /* merge values with the calculations before */
+        return $.extend({}, values, {vx: vx, x: x});
     },
 
     /**
@@ -195,12 +194,11 @@ window.equations = {
      * @version 1.0 (2017-12-11)
      */
     gradientProjectileMotionY: function(values, initialSettings) {
-        var k = 1.0;
+        var vy = - initialSettings.gamma / initialSettings.m * values.vx - 1.0 / initialSettings.m * values.x;
+        var y  = values.vx;
 
-        return {
-            vx: - initialSettings.gamma / initialSettings.m * values.vx - k / initialSettings.m * values.x,
-            x:  values.vx
-        };
+        /* merge values with the calculations before */
+        return $.extend({}, values, {vy: vy, y: y});
     },
 
 
@@ -213,8 +211,8 @@ window.equations = {
     deltaRungeKuttaOfFourthOrderProjectileMotion: function(values, deltaT, initialSettings) {
         var valuesX = this.deltaRungeKuttaOfFourthOrder(values, deltaT, initialSettings);
 
-        values.vx = valuesX.vx;
-        values.x  = valuesX.x;
+        values.vx = valuesX.gradient;
+        values.x  = valuesX.position;
 
         return values;
     },
@@ -247,8 +245,8 @@ window.equations = {
         var k4 = this.gradientProjectileMotionX(valuesK4, initialSettings);
 
         return {
-            vx: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
-            x:  values.x  + 1 / 6 * deltaT * (k1.x  + 2 * k2.x  + 2 * k3.x  + k4.x)
+            gradient: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
+            position: values.x  + 1 / 6 * deltaT * (k1.x  + 2 * k2.x  + 2 * k3.x  + k4.x)
         };
     }
 };
