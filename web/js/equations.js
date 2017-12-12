@@ -180,12 +180,8 @@ window.equations = {
      * @version 1.0 (2017-12-11)
      */
     gradientProjectileMotionX: function(values, initialSettings) {
-console.log('gradientProjectileMotionX', values);
-
         var vx = - initialSettings.gamma / initialSettings.m * Math.sqrt(Math.pow(values.vx, 2) + Math.pow(values.vy, 2)) * values.vx;
         var x  = values.vx;
-
-console.log('gradientProjectileMotionX-2', $.extend({}, values, {vx: vx, x: x}));
 
         /* merge values with the calculations before */
         return $.extend({}, values, {vx: vx, x: x});
@@ -198,12 +194,8 @@ console.log('gradientProjectileMotionX-2', $.extend({}, values, {vx: vx, x: x}))
      * @version 1.0 (2017-12-11)
      */
     gradientProjectileMotionY: function(values, initialSettings) {
-console.log('gradientProjectileMotionY', values);
-
         var vy = - initialSettings.gamma / initialSettings.m * Math.sqrt(Math.pow(values.vx, 2) + Math.pow(values.vy, 2)) * values.vy - initialSettings.g;
         var y  = values.vy;
-
-console.log('gradientProjectileMotionY-2', $.extend({}, values, {vy: vy, y: y}));
 
         /* merge values with the calculations before */
         return $.extend({}, values, {vy: vy, y: y});
