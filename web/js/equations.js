@@ -179,9 +179,11 @@ window.equations = {
      * @author  Björn Hempel <bjoern@hempel.li>
      * @version 1.0 (2017-12-11)
      */
-    gradientProjectileMotionX: function(m, k, gamma, values) {
+    gradientProjectileMotionX: function(values, initialSettings) {
+        var k = 1.0;
+
         return {
-            vx: - gamma / m * values.vx - k / m * values.x,
+            vx: - initialSettings.gamma / initialSettings.m * values.vx - k / initialSettings.m * values.x,
             x:  values.vx
         };
     },
@@ -192,9 +194,11 @@ window.equations = {
      * @author  Björn Hempel <bjoern@hempel.li>
      * @version 1.0 (2017-12-11)
      */
-    gradientProjectileMotionY: function(m, k, gamma, values) {
+    gradientProjectileMotionY: function(values, initialSettings) {
+        var k = 1.0;
+
         return {
-            vx: - gamma / m * values.vx - k / m * values.x,
+            vx: - initialSettings.gamma / initialSettings.m * values.vx - k / initialSettings.m * values.x,
             x:  values.vx
         };
     },
@@ -205,29 +209,26 @@ window.equations = {
      * @author  Björn Hempel <bjoern@hempel.li>
      * @version 1.0 (2017-11-25)
      */
-    deltaRungeKuttaOfFourthOrderProjectileMotion: function(m, gamma, values, deltaT) {
-        var k = 1.0;
-
-
-        var k1 = this.gradientProjectileMotionX(m, k, gamma, values);
+    deltaRungeKuttaOfFourthOrderProjectileMotion: function(values, deltaT, initialSettings) {
+        var k1 = this.gradientProjectileMotionX(values, initialSettings);
 
         var valuesK2 = {
             vx: values.vx + .5 * deltaT * k1.vx,
             x:  values.x  + .5 * deltaT * k1.x
         }
-        var k2 = this.gradientProjectileMotionX(m, k, gamma, valuesK2);
+        var k2 = this.gradientProjectileMotionX(valuesK2, initialSettings);
 
         var valuesK3 = {
             vx: values.vx + .5 * deltaT * k2.vx,
             x:  values.x  + .5 * deltaT * k2.x
         }
-        var k3 = this.gradientProjectileMotionX(m, k, gamma, valuesK3);
+        var k3 = this.gradientProjectileMotionX(valuesK3, initialSettings);
 
         var valuesK4 = {
             vx: values.vx + deltaT * k3.vx,
             x:  values.x  + deltaT * k3.x
         }
-        var k4 = this.gradientProjectileMotionX(m, k, gamma, valuesK4);
+        var k4 = this.gradientProjectileMotionX(valuesK4, initialSettings);
 
         return {
             vx: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
