@@ -209,7 +209,7 @@ window.equations = {
      * @version 1.0 (2017-11-25)
      */
     deltaRungeKuttaOfFourthOrderProjectileMotion: function(values, deltaT, initialSettings) {
-        var valuesX = this.deltaRungeKuttaOfFourthOrder(values, deltaT, initialSettings);
+        var valuesX = this.deltaRungeKuttaOfFourthOrder(values, deltaT, initialSettings, this.gradientProjectileMotionX);
 
         values.vx = valuesX.gradient;
         values.x  = valuesX.position;
@@ -223,26 +223,26 @@ window.equations = {
      * @author  Björn Hempel <bjoern@hempel.li>
      * @version 1.0 (2017-11-25)
      */
-    deltaRungeKuttaOfFourthOrder: function(values, deltaT, initialSettings) {
-        var k1 = this.gradientProjectileMotionX(values, initialSettings);
+    deltaRungeKuttaOfFourthOrder: function(values, deltaT, initialSettings, gradientFunction) {
+        var k1 = gradientFunction(values, initialSettings);
 
         var valuesK2 = {
             vx: values.vx + .5 * deltaT * k1.vx,
             x:  values.x  + .5 * deltaT * k1.x
         }
-        var k2 = this.gradientProjectileMotionX(valuesK2, initialSettings);
+        var k2 = gradientFunction(valuesK2, initialSettings);
 
         var valuesK3 = {
             vx: values.vx + .5 * deltaT * k2.vx,
             x:  values.x  + .5 * deltaT * k2.x
         }
-        var k3 = this.gradientProjectileMotionX(valuesK3, initialSettings);
+        var k3 = gradientFunction(valuesK3, initialSettings);
 
         var valuesK4 = {
             vx: values.vx + deltaT * k3.vx,
             x:  values.x  + deltaT * k3.x
         }
-        var k4 = this.gradientProjectileMotionX(valuesK4, initialSettings);
+        var k4 = gradientFunction(valuesK4, initialSettings);
 
         return {
             gradient: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
