@@ -162,12 +162,12 @@ window.equations = {
      * @author  Björn Hempel <bjoern@hempel.li>
      * @version 1.0 (2017-12-12)
      */
-    analyticPosition: function(values, initalSettings) {
+    analyticPosition: function(values, initialSettings) {
         values.y = 0;
 
-        values.y += -initalSettings.g / (2 * Math.pow(initalSettings.v0, 2) * Math.pow(Math.cos(initalSettings.alpha), 2)) * Math.pow(values.x - initalSettings.x0, 2);
-        values.y += Math.tan(initalSettings.alpha) * (values.x - initalSettings.x0);
-        values.y += initalSettings.y0;
+        values.y += -initialSettings.g / (2 * Math.pow(initialSettings.v0, 2) * Math.pow(Math.cos(initialSettings.alpha), 2)) * Math.pow(values.x - initialSettings.x0, 2);
+        values.y += Math.tan(initialSettings.alpha) * (values.x - initialSettings.x0);
+        values.y += initialSettings.y0;
 
         /* return the analytic solution */
         return values;

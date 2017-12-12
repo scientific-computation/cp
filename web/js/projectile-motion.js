@@ -7,7 +7,7 @@
 window.main = function() {
 
     /* some initial values */
-    var initalSettings = {
+    var initialSettings = {
         m:     1.0,
         gamma: 0.1,
         x0:    0.0,
@@ -62,17 +62,17 @@ window.main = function() {
     };
 
     /* calculate the runge kutta equation (4. order) */
-    var values = {x: initalSettings.x0, vx: initalSettings.v0, y: initalSettings.x0, vy: initalSettings.v0};
+    var values = {x: initialSettings.x0, vx: initialSettings.v0, y: initialSettings.x0, vy: initialSettings.v0};
     for (var t = tMin; t <= tMax; t = t + tPrecision) {
-        values = equations.deltaRungeKuttaOfFourthOrderProjectileMotion(initalSettings.m, initalSettings.gamma, values, tPrecision);
+        values = equations.deltaRungeKuttaOfFourthOrderProjectileMotion(initialSettings.m, initialSettings.gamma, values, tPrecision);
         traceRungeKuttaMethodOfFourthOrder.x.push(t);
         traceRungeKuttaMethodOfFourthOrder.y.push(values.x);
     }
 
     /* calculate the analytic equation without friction */
-    var values = {x: initalSettings.x0, y: initalSettings.y0};
+    var values = {x: initialSettings.x0, y: initialSettings.y0};
     do {
-        values = equations.analyticPosition(values, initalSettings);
+        values = equations.analyticPosition(values, initialSettings);
 
         traceAnalytic.x.push(values.x);
         traceAnalytic.y.push(values.y);
