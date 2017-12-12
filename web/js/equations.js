@@ -209,7 +209,16 @@ window.equations = {
      * @version 1.0 (2017-11-25)
      */
     deltaRungeKuttaOfFourthOrderProjectileMotion: function(values, deltaT, initialSettings) {
-        var valuesX = this.deltaRungeKuttaOfFourthOrder(values, deltaT, initialSettings, this.gradientProjectileMotionX);
+        var gradientIndexesX = {gradient: 'vx', position: 'x'};
+        var gradientIndexesY = {gradient: 'vy', position: 'y'};
+
+        var valuesX = this.deltaRungeKuttaOfFourthOrder(
+            values,
+            deltaT,
+            initialSettings,
+            this.gradientProjectileMotionX,
+            gradientIndexesX
+        );
 
         values.vx = valuesX.gradient;
         values.x  = valuesX.position;
@@ -223,30 +232,35 @@ window.equations = {
      * @author  Björn Hempel <bjoern@hempel.li>
      * @version 1.0 (2017-11-25)
      */
-    deltaRungeKuttaOfFourthOrder: function(values, deltaT, initialSettings, gradientFunction) {
+    deltaRungeKuttaOfFourthOrder: function(values, deltaT, initialSettings, gradientFunction, gradientIndexes) {
+        var iGradient = gradientIndexes.gradient;
+        var iPosition = gradientIndexes.position;
+
+        /* calculate k1 */
         var k1 = gradientFunction(values, initialSettings);
 
-        var valuesK2 = {
-            vx: values.vx + .5 * deltaT * k1.vx,
-            x:  values.x  + .5 * deltaT * k1.x
-        }
+        /* calculate k2 */
+        var valuesK2 = {};
+        valuesK2[iGradient] = values[iGradient] + .5 * deltaT * k1[iGradient];
+        valuesK2[iPosition] = values[iPosition] + .5 * deltaT * k1[iPosition];
         var k2 = gradientFunction(valuesK2, initialSettings);
 
-        var valuesK3 = {
-            vx: values.vx + .5 * deltaT * k2.vx,
-            x:  values.x  + .5 * deltaT * k2.x
-        }
+        /* calculate k3 */
+        var valuesK3 = {};
+        valuesK3[iGradient] = values[iGradient] + .5 * deltaT * k2[iGradient];
+        valuesK3[iPosition] = values[iPosition] + .5 * deltaT * k2[iPosition];
         var k3 = gradientFunction(valuesK3, initialSettings);
 
-        var valuesK4 = {
-            vx: values.vx + deltaT * k3.vx,
-            x:  values.x  + deltaT * k3.x
-        }
+        /* calculate k4 */
+        var valuesK4 = {};
+        valuesK4[iGradient] = values[iGradient] + deltaT * k3[iGradient];
+        valuesK4[iPosition] = values[iPosition] + deltaT * k3[iPosition];
         var k4 = gradientFunction(valuesK4, initialSettings);
 
+        /* summarize */
         return {
-            gradient: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
-            position: values.x  + 1 / 6 * deltaT * (k1.x  + 2 * k2.x  + 2 * k3.x  + k4.x)
+            gradient: values[iGradient] + 1 / 6 * deltaT * (k1[iGradient] + 2 * k2[iGradient] + 2 * k3[iGradient] + k4[iGradient]),
+            position: values[iPosition] + 1 / 6 * deltaT * (k1[iPosition] + 2 * k2[iPosition] + 2 * k3[iPosition] + k4[iPosition])
         };
     }
 };
