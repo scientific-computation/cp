@@ -70,16 +70,15 @@ window.main = function() {
     }
 
     /* calculate the analytic equation without friction */
-    var x = 0;
-    var y = 0;
+    var values = {x: initalSettings.x0, y: initalSettings.y0};
     do {
-        y = equations.analyticPosition(x, initalSettings);
+        values = equations.analyticPosition(values, initalSettings);
 
-        traceAnalytic.x.push(x);
-        traceAnalytic.y.push(y);
+        traceAnalytic.x.push(values.x);
+        traceAnalytic.y.push(values.y);
 
-        x += tPrecision;
-    } while (y > 0);
+        values.x += tPrecision;
+    } while (values.y > 0);
 
     /* initialize the data output (result and error) */
     var data = [traceRungeKuttaMethodOfFourthOrder, traceAnalytic];
