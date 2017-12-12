@@ -9,7 +9,7 @@ window.main = function() {
     /* some initial calculation values */
     var tMin         = 0;
     var tMax         = 20;
-    var tPrecision   = 0.05;
+    var tPrecision   = 0.01;
 
     /* some initial design values */
     var traceOpacity = 1.0;
@@ -44,14 +44,26 @@ window.main = function() {
     };
 
     /* build the trace container (runge kutta method - 4. order) */
-    var traceRungeKuttaMethodOfFourthOrder = {
+    var traceRungeKuttaMethodOfFourthOrderWithFriction = {
         x: [],
         y: [],
-        name: 'Runge-Kutta method of 4. order (with friction)',
+        name: 'Runge-Kutta method of 4. order (with air friction)',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
-            width: traceWidth
+            width: traceWidth + 1
+        }
+    };
+
+    /* build the trace container (runge kutta method - 4. order) */
+    var traceRungeKuttaMethodOfFourthOrderWithoutFriction = {
+        x: [],
+        y: [],
+        name: 'Runge-Kutta method of 4. order (without air friction)',
+        type: 'scatter',
+        opacity: traceOpacity,
+        line: {
+            width: traceWidth + 1
         }
     };
 
@@ -59,7 +71,7 @@ window.main = function() {
     var traceAnalytic = {
         x: [],
         y: [],
-        name: 'Analytic solution (without friction)',
+        name: 'Analytic solution (without air friction)',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
@@ -75,9 +87,25 @@ window.main = function() {
         vy: initialSettings.vy0
     };
     do {
+        traceRungeKuttaMethodOfFourthOrderWithFriction.x.push(values.x);
+        traceRungeKuttaMethodOfFourthOrderWithFriction.y.push(values.y);
+
         values = equations.deltaRungeKuttaOfFourthOrderProjectileMotion(values, tPrecision, initialSettings);
-        traceRungeKuttaMethodOfFourthOrder.x.push(values.x);
-        traceRungeKuttaMethodOfFourthOrder.y.push(values.y);
+    } while (values.y > 0);
+
+    /* calculate the runge kutta equation (4. order) */
+    initialSettings.gamma = 0;
+    var values = {
+        x:  initialSettings.x0,
+        vx: initialSettings.vx0,
+        y:  initialSettings.y0,
+        vy: initialSettings.vy0
+    }; 
+    do {
+        traceRungeKuttaMethodOfFourthOrderWithoutFriction.x.push(values.x);
+        traceRungeKuttaMethodOfFourthOrderWithoutFriction.y.push(values.y);
+
+        values = equations.deltaRungeKuttaOfFourthOrderProjectileMotion(values, tPrecision, initialSettings);
     } while (values.y > 0);
 
     /* calculate the analytic equation without friction */
@@ -92,7 +120,7 @@ window.main = function() {
     } while (values.y > 0);
 
     /* initialize the data output (result and error) */
-    var data = [traceRungeKuttaMethodOfFourthOrder, traceAnalytic];
+    var data = [traceRungeKuttaMethodOfFourthOrderWithFriction, traceRungeKuttaMethodOfFourthOrderWithoutFriction, traceAnalytic];
 
     /* build the graph and error graph */
     Plotly.newPlot(
