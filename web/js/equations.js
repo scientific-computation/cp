@@ -180,8 +180,12 @@ window.equations = {
      * @version 1.0 (2017-12-11)
      */
     gradientProjectileMotionX: function(values, initialSettings) {
-        var vx = - initialSettings.gamma / initialSettings.m * values.vx - 1.0 / initialSettings.m * values.x;
+console.log('gradientProjectileMotionX', values);
+
+        var vx = - initialSettings.gamma / initialSettings.m * Math.sqrt(Math.pow(values.vx, 2) + Math.pow(values.vy, 2)) * values.vx;
         var x  = values.vx;
+
+console.log('gradientProjectileMotionX-2', $.extend({}, values, {vx: vx, x: x}));
 
         /* merge values with the calculations before */
         return $.extend({}, values, {vx: vx, x: x});
@@ -194,8 +198,12 @@ window.equations = {
      * @version 1.0 (2017-12-11)
      */
     gradientProjectileMotionY: function(values, initialSettings) {
-        var vy = - initialSettings.gamma / initialSettings.m * values.vx - 1.0 / initialSettings.m * values.x;
-        var y  = values.vx;
+console.log('gradientProjectileMotionY', values);
+
+        var vy = - initialSettings.gamma / initialSettings.m * Math.sqrt(Math.pow(values.vx, 2) + Math.pow(values.vy, 2)) * values.vy - initialSettings.g;
+        var y  = values.vy;
+
+console.log('gradientProjectileMotionY-2', $.extend({}, values, {vy: vy, y: y}));
 
         /* merge values with the calculations before */
         return $.extend({}, values, {vy: vy, y: y});
@@ -220,8 +228,19 @@ window.equations = {
             gradientIndexesX
         );
 
+        var valuesY = this.deltaRungeKuttaOfFourthOrder(
+            values,
+            deltaT,
+            initialSettings,
+            this.gradientProjectileMotionY,
+            gradientIndexesY
+        );
+
         values.vx = valuesX.gradient;
         values.x  = valuesX.position;
+
+        values.vy = valuesY.gradient;
+        values.y  = valuesY.position;
 
         return values;
     },
@@ -240,19 +259,19 @@ window.equations = {
         var k1 = gradientFunction(values, initialSettings);
 
         /* calculate k2 */
-        var valuesK2 = {};
+        var valuesK2 = $.extend({}, values);
         valuesK2[iGradient] = values[iGradient] + .5 * deltaT * k1[iGradient];
         valuesK2[iPosition] = values[iPosition] + .5 * deltaT * k1[iPosition];
         var k2 = gradientFunction(valuesK2, initialSettings);
 
         /* calculate k3 */
-        var valuesK3 = {};
+        var valuesK3 = $.extend({}, values);
         valuesK3[iGradient] = values[iGradient] + .5 * deltaT * k2[iGradient];
         valuesK3[iPosition] = values[iPosition] + .5 * deltaT * k2[iPosition];
         var k3 = gradientFunction(valuesK3, initialSettings);
 
         /* calculate k4 */
-        var valuesK4 = {};
+        var valuesK4 = $.extend({}, values);
         valuesK4[iGradient] = values[iGradient] + deltaT * k3[iGradient];
         valuesK4[iPosition] = values[iPosition] + deltaT * k3[iPosition];
         var k4 = gradientFunction(valuesK4, initialSettings);

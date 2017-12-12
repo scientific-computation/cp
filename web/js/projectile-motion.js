@@ -74,11 +74,11 @@ window.main = function() {
         y:  initialSettings.y0,
         vy: initialSettings.vy0
     };
-    for (var t = tMin; t <= tMax; t = t + tPrecision) {
+    do {
         values = equations.deltaRungeKuttaOfFourthOrderProjectileMotion(values, tPrecision, initialSettings);
-        traceRungeKuttaMethodOfFourthOrder.x.push(t);
-        traceRungeKuttaMethodOfFourthOrder.y.push(values.x);
-    }
+        traceRungeKuttaMethodOfFourthOrder.x.push(values.x);
+        traceRungeKuttaMethodOfFourthOrder.y.push(values.y);
+    } while (values.y > 0);
 
     /* calculate the analytic equation without friction */
     var values = {x: initialSettings.x0, y: initialSettings.y0};
