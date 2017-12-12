@@ -203,6 +203,7 @@ window.equations = {
         };
     },
 
+
     /**
      * Calculates the runge kutta method (4. order) version of analyticProjectileMotion.
      *
@@ -210,6 +211,21 @@ window.equations = {
      * @version 1.0 (2017-11-25)
      */
     deltaRungeKuttaOfFourthOrderProjectileMotion: function(values, deltaT, initialSettings) {
+        var valuesX = this.deltaRungeKuttaOfFourthOrder(values, deltaT, initialSettings);
+
+        values.vx = valuesX.vx;
+        values.x  = valuesX.x;
+
+        return values;
+    },
+
+    /**
+     * Calculates the runge kutta method (4. order) version of analyticProjectileMotion.
+     *
+     * @author  Björn Hempel <bjoern@hempel.li>
+     * @version 1.0 (2017-11-25)
+     */
+    deltaRungeKuttaOfFourthOrder: function(values, deltaT, initialSettings) {
         var k1 = this.gradientProjectileMotionX(values, initialSettings);
 
         var valuesK2 = {
@@ -231,8 +247,6 @@ window.equations = {
         var k4 = this.gradientProjectileMotionX(valuesK4, initialSettings);
 
         return {
-            vx: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
-            x:  values.x  + 1 / 6 * deltaT * (k1.x  + 2 * k2.x  + 2 * k3.x  + k4.x),
             vx: values.vx + 1 / 6 * deltaT * (k1.vx + 2 * k2.vx + 2 * k3.vx + k4.vx),
             x:  values.x  + 1 / 6 * deltaT * (k1.x  + 2 * k2.x  + 2 * k3.x  + k4.x)
         };
