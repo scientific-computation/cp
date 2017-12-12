@@ -6,7 +6,16 @@
  */
 window.main = function() {
 
-    /* some initial values */
+    /* some initial calculation values */
+    var tMin         = 0;
+    var tMax         = 20;
+    var tPrecision   = 0.05;
+
+    /* some initial design values */
+    var traceOpacity = 1.0;
+    var traceWidth   = 1;
+
+    /* some initial motion equation values */
     var initialSettings = {
         m:     1.0,
         gamma: 0.1,
@@ -18,12 +27,9 @@ window.main = function() {
         alpha: 0.8
     };
 
-    var tMin         = 0;
-    var tMax         = 20;
-    var tPrecision   = 0.05;
-    var traceOpacity = 1.0;
-    var traceWidth   = 1;
-
+    /* calculate some initial values */
+    initialSettings.vx0 = Math.cos(initialSettings.alpha) * initialSettings.v0;
+    initialSettings.vy0 = Math.sin(initialSettings.alpha) * initialSettings.v0
 
     /* layout graph */
     var layout = {
@@ -41,7 +47,7 @@ window.main = function() {
     var traceRungeKuttaMethodOfFourthOrder = {
         x: [],
         y: [],
-        name: 'Runge-Kutta method of 4. order',
+        name: 'Runge-Kutta method of 4. order (with friction)',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
@@ -53,7 +59,7 @@ window.main = function() {
     var traceAnalytic = {
         x: [],
         y: [],
-        name: 'Analytic solution',
+        name: 'Analytic solution (without friction)',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
