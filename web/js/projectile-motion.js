@@ -35,10 +35,12 @@ window.main = function() {
         title: '',
         showlegend: true,
         xaxis: {
-            title: 'x(t)'
+            title: 'x(t)',
+            range: [-2, 18]
         },
         yaxis: {
-            title: 'y(t)'
+            title: 'y(t)',
+            range: [-2, 14]
         }
     };
 
@@ -56,6 +58,33 @@ window.main = function() {
     );
 
     window.calculate(window.initialSettings, window.tPrecision);
+};
+
+/**
+ * Delete trace helper.
+ *
+ * @version 1.0 (2017-12-13)
+ * @author  Björn Hempel <bjoern@hempel.li>
+ */
+window.deleteTrace = function(idPlotly, idTrace) {
+    if (document.getElementById(idPlotly) === null) {
+        return false;
+    }
+
+    var data     = document.getElementById(idPlotly).data;
+    var deleteId = -1;
+
+    for (var i = 0; i < data.length; i++) {
+        if (data[i].id === idTrace) {
+            deleteId = i;
+        }
+    }
+
+    if (deleteId < 0) {
+        return false;
+    }
+
+    return Plotly.deleteTraces(idPlotly, deleteId);
 };
 
 /**
@@ -78,7 +107,8 @@ window.calculate = function(initialSettings, tPrecision) {
     var traceRungeKuttaMethodOfFourthOrderWithFriction = {
         x: [],
         y: [],
-        name: 'Runge-Kutta method of 4. order (with air friction)',
+        id: 'trace-rk4-with-friction',
+        name: 'RK4 (with air friction)',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
@@ -90,7 +120,8 @@ window.calculate = function(initialSettings, tPrecision) {
     var traceRungeKuttaMethodOfFourthOrderWithoutFriction = {
         x: [],
         y: [],
-        name: 'Runge-Kutta method of 4. order (without air friction)',
+        id: 'trace-rk4-without-friction',
+        name: 'RK4 (without air friction)',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
@@ -102,6 +133,7 @@ window.calculate = function(initialSettings, tPrecision) {
     var traceAnalytic = {
         x: [],
         y: [],
+        id: 'trace-analytic-with-friction',
         name: 'Analytic solution (without air friction)',
         type: 'scatter',
         opacity: traceOpacity,
@@ -125,7 +157,6 @@ window.calculate = function(initialSettings, tPrecision) {
     } while (values.y > 0);
 
     /* calculate the runge kutta equation (4. order) */
-    initialSettings.gamma = 0;
     var values = {
         x:  initialSettings.x0,
         vx: initialSettings.vx0,
@@ -136,7 +167,7 @@ window.calculate = function(initialSettings, tPrecision) {
         traceRungeKuttaMethodOfFourthOrderWithoutFriction.x.push(values.x);
         traceRungeKuttaMethodOfFourthOrderWithoutFriction.y.push(values.y);
 
-        values = equations.deltaRungeKuttaOfFourthOrderProjectileMotion(values, tPrecision, initialSettings);
+        values = equations.deltaRungeKuttaOfFourthOrderProjectileMotion(values, tPrecision, $.extend({}, initialSettings, {gamma: 0}));
     } while (values.y > 0);
 
     /* calculate the analytic equation without friction */
@@ -149,8 +180,13 @@ window.calculate = function(initialSettings, tPrecision) {
     } while (values.y > 0);
 
     /* initialize the data output (result and error) */
+    window.deleteTrace(window.idDivPlotly, 'trace-rk4-with-friction');
     Plotly.addTraces(window.idDivPlotly, traceRungeKuttaMethodOfFourthOrderWithFriction);
+
+    window.deleteTrace(window.idDivPlotly, 'trace-rk4-without-friction');
     Plotly.addTraces(window.idDivPlotly, traceRungeKuttaMethodOfFourthOrderWithoutFriction);
+
+    window.deleteTrace(window.idDivPlotly, 'trace-analytic-with-friction');
     Plotly.addTraces(window.idDivPlotly, traceAnalytic);
 };
 
