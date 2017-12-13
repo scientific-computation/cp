@@ -20,6 +20,9 @@ window.initialSettings = {
     alpha: 0.8
 };
 
+/* plotly id */
+window.idDivPlotly = 'graph-oscillator-harmonic-damped';
+
 /**
  * Main start function.
  *
@@ -27,27 +30,6 @@ window.initialSettings = {
  * @author  Björn Hempel <bjoern@hempel.li>
  */
 window.main = function() {
-    window.calculate(window.initialSettings, window.tPrecision);
-};
-
-/**
- * The numeric calculator.
- *
- * @version 1.0 (2017-12-12)
- * @author  Björn Hempel <bjoern@hempel.li>
- */
-window.calculate = function(initialSettings, tPrecision) {
-
-    //Plotly.purge('');
-
-    /* some initial design values */
-    var traceOpacity = 1.0;
-    var traceWidth   = 1;
-
-    /* calculate some initial values */
-    initialSettings.vx0 = Math.cos(initialSettings.alpha) * initialSettings.v0;
-    initialSettings.vy0 = Math.sin(initialSettings.alpha) * initialSettings.v0
-
     /* layout graph */
     var layout = {
         title: '',
@@ -59,6 +41,38 @@ window.calculate = function(initialSettings, tPrecision) {
             title: 'y(t)'
         }
     };
+
+    /* create plotly instance */
+    Plotly.newPlot(
+        window.idDivPlotly,
+        [],
+        layout,
+        {
+            displayModeBar: false,
+            scrollZoom: false,
+            editable: false,
+            staticPlot: true
+        }
+    );
+
+    window.calculate(window.initialSettings, window.tPrecision);
+};
+
+/**
+ * The numeric calculator.
+ *
+ * @version 1.0 (2017-12-12)
+ * @author  Björn Hempel <bjoern@hempel.li>
+ */
+window.calculate = function(initialSettings, tPrecision) {
+
+    /* some initial design values */
+    var traceOpacity = 1.0;
+    var traceWidth   = 1;
+
+    /* calculate some initial values */
+    initialSettings.vx0 = Math.cos(initialSettings.alpha) * initialSettings.v0;
+    initialSettings.vy0 = Math.sin(initialSettings.alpha) * initialSettings.v0
 
     /* build the trace container (runge kutta method - 4. order) */
     var traceRungeKuttaMethodOfFourthOrderWithFriction = {
@@ -135,19 +149,8 @@ window.calculate = function(initialSettings, tPrecision) {
     } while (values.y > 0);
 
     /* initialize the data output (result and error) */
-    var data = [traceRungeKuttaMethodOfFourthOrderWithFriction, traceRungeKuttaMethodOfFourthOrderWithoutFriction, traceAnalytic];
-
-    /* build the graph and error graph */
-    Plotly.newPlot(
-        'graph-oscillator-harmonic-damped',
-        data,
-        layout,
-        {
-            displayModeBar: false,
-            scrollZoom: false,
-            editable: false,
-            staticPlot: true
-        }
-    );
+    Plotly.addTraces(window.idDivPlotly, traceRungeKuttaMethodOfFourthOrderWithFriction);
+    Plotly.addTraces(window.idDivPlotly, traceRungeKuttaMethodOfFourthOrderWithoutFriction);
+    Plotly.addTraces(window.idDivPlotly, traceAnalytic);
 };
 
