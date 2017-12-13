@@ -162,7 +162,11 @@ window.equations = {
      * @author  Björn Hempel <bjoern@hempel.li>
      * @version 1.0 (2017-12-12)
      */
-    analyticPosition: function(values, initialSettings) {
+    analyticPosition: function(values, deltaT, initialSettings) {
+        if (deltaT > 0) {
+            values.x += deltaT;
+        }
+
         values.y = 0;
 
         values.y += -initialSettings.g / (2 * Math.pow(initialSettings.v0, 2) * Math.pow(Math.cos(initialSettings.alpha), 2)) * Math.pow(values.x - initialSettings.x0, 2);

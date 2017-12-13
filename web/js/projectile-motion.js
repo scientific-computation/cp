@@ -38,6 +38,8 @@ window.main = function() {
  */
 window.calculate = function(initialSettings, tPrecision) {
 
+    //Plotly.purge('');
+
     /* some initial design values */
     var traceOpacity = 1.0;
     var traceWidth   = 1;
@@ -124,14 +126,12 @@ window.calculate = function(initialSettings, tPrecision) {
     } while (values.y > 0);
 
     /* calculate the analytic equation without friction */
-    var values = equations.analyticPosition({x: initialSettings.x0, y: initialSettings.y0}, initialSettings);
+    var values = equations.analyticPosition({x: initialSettings.x0, y: initialSettings.y0}, tPrecision, initialSettings);
     do {
         traceAnalytic.x.push(values.x);
         traceAnalytic.y.push(values.y);
 
-        values.x += tPrecision;
-
-        values = equations.analyticPosition(values, initialSettings);
+        values = equations.analyticPosition(values, tPrecision, initialSettings);
     } while (values.y > 0);
 
     /* initialize the data output (result and error) */
