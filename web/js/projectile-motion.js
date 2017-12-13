@@ -5,6 +5,21 @@
  * @author  Björn Hempel <bjoern@hempel.li>
  */
 
+/* some initial calculation values */
+window.tPrecision = 0.2;
+
+/* some initial motion equation values */
+window.initialSettings = {
+    m:     1.0,
+    gamma: 0.1,
+    x0:    0.0,
+    g:     10.0,
+    v0:    10.0,
+    x0:    0.0,
+    y0:    10.0,
+    alpha: 0.8
+};
+
 /**
  * Main start function.
  *
@@ -12,7 +27,7 @@
  * @author  Björn Hempel <bjoern@hempel.li>
  */
 window.main = function() {
-    window.calculate();
+    window.calculate(window.initialSettings, window.tPrecision);
 };
 
 /**
@@ -21,27 +36,11 @@ window.main = function() {
  * @version 1.0 (2017-12-12)
  * @author  Björn Hempel <bjoern@hempel.li>
  */
-window.calculate = function() {
-    /* some initial calculation values */
-    var tMin         = 0;
-    var tMax         = 20;
-    var tPrecision   = 0.01;
+window.calculate = function(initialSettings, tPrecision) {
 
     /* some initial design values */
     var traceOpacity = 1.0;
     var traceWidth   = 1;
-
-    /* some initial motion equation values */
-    var initialSettings = {
-        m:     1.0,
-        gamma: 0.1,
-        x0:    0.0,
-        g:     10.0,
-        v0:    10.0,
-        x0:    0.0,
-        y0:    10.0,
-        alpha: 0.8
-    };
 
     /* calculate some initial values */
     initialSettings.vx0 = Math.cos(initialSettings.alpha) * initialSettings.v0;
@@ -125,14 +124,14 @@ window.calculate = function() {
     } while (values.y > 0);
 
     /* calculate the analytic equation without friction */
-    var values = {x: initialSettings.x0, y: initialSettings.y0};
+    var values = equations.analyticPosition({x: initialSettings.x0, y: initialSettings.y0}, initialSettings);
     do {
-        values = equations.analyticPosition(values, initialSettings);
-
         traceAnalytic.x.push(values.x);
         traceAnalytic.y.push(values.y);
 
         values.x += tPrecision;
+
+        values = equations.analyticPosition(values, initialSettings);
     } while (values.y > 0);
 
     /* initialize the data output (result and error) */
