@@ -1,11 +1,27 @@
-/**
- * Calculates a damped harmonic oscillator.
+/*
+ * Numeric calculation of projectile motions.
  *
- * @version 1.0 (2017-11-28)
+ * @version 1.0 (2017-12-12)
+ * @author  Björn Hempel <bjoern@hempel.li>
+ */
+
+/**
+ * Main start function.
+ *
+ * @version 1.0 (2017-12-12)
  * @author  Björn Hempel <bjoern@hempel.li>
  */
 window.main = function() {
+    window.calculate();
+};
 
+/**
+ * The numeric calculator.
+ *
+ * @version 1.0 (2017-12-12)
+ * @author  Björn Hempel <bjoern@hempel.li>
+ */
+window.calculate = function() {
     /* some initial calculation values */
     var tMin         = 0;
     var tMax         = 20;
@@ -135,3 +151,4 @@ window.main = function() {
         }
     );
 };
+
