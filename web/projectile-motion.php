@@ -38,9 +38,15 @@
             </p>
 
             <p>
-                <button type="button" onclick="window.calculate(window.initialSettings, 0.01);">γ = 0.01</button>
-                <button type="button" onclick="window.calculate(window.initialSettings, 0.2);">γ = 0.2</button>
-                <button type="button" onclick="window.calculate(window.initialSettings, 0.5);">γ = 0.5</button>
+                <button type="button" onclick="window.tPrecision = 0.01; window.calculate(window.initialSettings, window.tPrecision);">Δt = 0.01</button>
+                <button type="button" onclick="window.tPrecision = 0.2;  window.calculate(window.initialSettings, window.tPrecision);">Δt = 0.2</button>
+                <button type="button" onclick="window.tPrecision = 0.5;  window.calculate(window.initialSettings, window.tPrecision);">Δt = 0.5</button>
+            </p>
+
+            <p>
+                <button type="button" onclick="window.initialSettings.gamma = 0.1; window.calculate(window.initialSettings, window.tPrecision);">γ = 0.1</button>
+                <button type="button" onclick="window.initialSettings.gamma = 0.2; window.calculate(window.initialSettings, window.tPrecision);">γ = 0.2</button>
+                <button type="button" onclick="window.initialSettings.gamma = 0.5; window.calculate(window.initialSettings, window.tPrecision);">γ = 0.5</button>
             </p>
         </div>
         <div id="graph-oscillator-harmonic-damped" class="graph"></div>

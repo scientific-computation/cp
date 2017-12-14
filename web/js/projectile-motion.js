@@ -6,7 +6,7 @@
  */
 
 /* some initial calculation values */
-window.tPrecision = 0.2;
+window.tPrecision = 0.5;
 
 /* some initial motion equation values */
 window.initialSettings = {
@@ -171,7 +171,7 @@ window.calculate = function(initialSettings, tPrecision) {
     } while (values.y > 0);
 
     /* calculate the analytic equation without friction */
-    var values = equations.analyticPosition({x: initialSettings.x0, y: initialSettings.y0}, tPrecision, initialSettings);
+    var values = equations.analyticPosition({x: initialSettings.x0, y: initialSettings.y0}, 0, initialSettings);
     do {
         traceAnalytic.x.push(values.x);
         traceAnalytic.y.push(values.y);
