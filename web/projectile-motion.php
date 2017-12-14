@@ -36,6 +36,12 @@
                     </tr>
                 </table>
             </p>
+
+            <p>
+                <button type="button" onclick="window.calculate(window.initialSettings, 0.01);">γ = 0.01</button>
+                <button type="button" onclick="window.calculate(window.initialSettings, 0.2);">γ = 0.2</button>
+                <button type="button" onclick="window.calculate(window.initialSettings, 0.5);">γ = 0.5</button>
+            </p>
         </div>
         <div id="graph-oscillator-harmonic-damped" class="graph"></div>
     </body>
