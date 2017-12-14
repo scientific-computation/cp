@@ -6,7 +6,7 @@
  */
 
 /* some initial calculation values */
-window.tPrecision = 0.5;
+window.tPrecision = 0.01;
 
 /* some initial motion equation values */
 window.initialSettings = {
@@ -58,6 +58,18 @@ window.main = function() {
     );
 
     window.calculate(window.initialSettings, window.tPrecision);
+
+    document.getElementById('equation-settings').addEventListener(
+        'submit', 
+        function (evt) {
+            window.initialSettings.gamma = parseFloat($('#settings-gamma').find(':selected').val());
+            window.tPrecision = parseFloat($('#settings-delta-t').find(':selected').val());
+
+            window.calculate(window.initialSettings, window.tPrecision);
+
+    	    evt.preventDefault();
+        }
+    );
 };
 
 /**
@@ -108,7 +120,7 @@ window.calculate = function(initialSettings, tPrecision) {
         x: [],
         y: [],
         id: 'trace-rk4-with-friction',
-        name: 'RK4 (with air friction)',
+        name: 'RK4 (with air friction γ = ' + window.initialSettings.gamma + ')',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
