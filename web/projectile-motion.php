@@ -45,7 +45,7 @@
                             <td>=</td>
                             <td>
                                 <select id="settings-delta-t" name="delta-t">
-                                    <option value="0.01">0.01</option>
+                                    <option value="0.01" selected>0.01</option>
                                     <option value="0.2">0.2</option>
                                     <option value="0.5">0.5</option>
                                 </select>
@@ -56,15 +56,70 @@
                             <td>=</td>
                             <td>
                                 <select id="settings-gamma" name="gamma">
-                                    <option value="0.1">0.1</option>
+                                    <option value="0.1" selected>0.1</option>
                                     <option value="0.2">0.2</option>
                                     <option value="0.5">0.5</option>
                                 </select>
                             </td>
+                            <td>&nbsp;</td>
+                            <td>\(\alpha\)</td>
+                            <td>=</td>
+                            <td>
+                                <select id="settings-alpha" name="alpha">
+                                    <option value="90">90° (1.6)</option>
+                                    <option value="75">75° (1.3)</option>
+                                    <option value="60">60° (1.0)</option>
+                                    <option value="45" selected>45° (0.8)</option>
+                                    <option value="30">30° (0.5)</option>
+                                    <option value="15">15° (0.3)</option>
+                                    <option value="0">0° (0.0)</option>
+                                </select>
+                            </td>
+                            <td>&nbsp;</td>
+                            <td>\(m\)</td>
+                            <td>=</td>
+                            <td>
+                                <select id="settings-m" name="m">
+                                    <option value="1.0">1.0</option>
+                                    <option value="2.0">2.0</option>
+                                    <option value="10.0">10.0</option>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td></td>
+                            <td>\(x_0\)</td>
+                            <td>=</td>
+                            <td>
+                                <select id="settings-x0" name="x0">
+                                    <option value="0.0" selected>0.0</option>
+                                    <option value="5.0">5.0</option>
+                                    <option value="10.0">10.0</option>
+                                </select>
+                            </td>
+                            <td>&nbsp;</td>
+                            <td>\(y_0\)</td>
+                            <td>=</td>
+                            <td>
+                                <select id="settings-y0" name="y0">
+                                    <option value="0.0">0.0</option>
+                                    <option value="5.0">5.0</option>
+                                    <option value="10.0" selected>10.0</option>
+                                </select>
+                            </td>
+                            <td>&nbsp;</td>
+                            <td>\(v_0\)</td>
+                            <td>=</td>
+                            <td>
+                                <select id="settings-v0" name="v0">
+                                    <option value="0.0">0.0</option>
+                                    <option value="1.0">1.0</option>
+                                    <option value="2.0">2.0</option>
+                                    <option value="10.0" selected>10.0</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10"></td>
                             <td><input type="submit" value="render"></td>
                         </tr>
                     </table>

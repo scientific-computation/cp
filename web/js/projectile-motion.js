@@ -62,9 +62,7 @@ window.main = function() {
     document.getElementById('equation-settings').addEventListener(
         'submit', 
         function (evt) {
-            window.initialSettings.gamma = parseFloat($('#settings-gamma').find(':selected').val());
-            window.tPrecision = parseFloat($('#settings-delta-t').find(':selected').val());
-
+            window.initialiseSettings();
             window.calculate(window.initialSettings, window.tPrecision);
 
     	    evt.preventDefault();
@@ -100,6 +98,27 @@ window.deleteTrace = function(idPlotly, idTrace) {
 };
 
 /**
+ * Initialise the initialSettings.
+ *
+ * @version 1.0 (2017-12-14)
+ * @author  Björn Hempel <bjoern@hempel.li>
+ */
+window.initialiseSettings = function() {
+    window.tPrecision = parseFloat($('#settings-delta-t').find(':selected').val());
+
+    window.initialSettings = {
+        m:     parseFloat($('#settings-m').find(':selected').val()),
+        gamma: parseFloat($('#settings-gamma').find(':selected').val()),
+        x0:    parseFloat($('#settings-x0').find(':selected').val()),
+        g:     10.0,
+        v0:    parseFloat($('#settings-v0').find(':selected').val()),
+        x0:    parseFloat($('#settings-x0').find(':selected').val()),
+        y0:    parseFloat($('#settings-y0').find(':selected').val()),
+        alpha: Math.round(Math.PI / 2 / 90 * parseFloat($('#settings-alpha').find(':selected').val()) * 10) / 10
+    };
+};
+
+/**
  * The numeric calculator.
  *
  * @version 1.0 (2017-12-12)
@@ -120,7 +139,7 @@ window.calculate = function(initialSettings, tPrecision) {
         x: [],
         y: [],
         id: 'trace-rk4-with-friction',
-        name: 'RK4 (with air friction γ = ' + window.initialSettings.gamma + ')',
+        name: 'RK4 (with air friction; γ = ' + window.initialSettings.gamma + ')',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
@@ -133,7 +152,7 @@ window.calculate = function(initialSettings, tPrecision) {
         x: [],
         y: [],
         id: 'trace-rk4-without-friction',
-        name: 'RK4 (without air friction)',
+        name: 'RK4 (without air friction; γ = 0)',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
@@ -146,7 +165,7 @@ window.calculate = function(initialSettings, tPrecision) {
         x: [],
         y: [],
         id: 'trace-analytic-with-friction',
-        name: 'Analytic solution (without air friction)',
+        name: 'Analytic solution (without air friction; γ = 0)',
         type: 'scatter',
         opacity: traceOpacity,
         line: {
