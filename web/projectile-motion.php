@@ -26,13 +26,13 @@
                         <td><strong>Friction:</strong></td><td>\(\vec F_R = - \gamma \cdot | \vec \upsilon | \cdot \vec \upsilon\)</td>
                     </tr>
                     <tr>
-                        <td><strong>x:</strong></td><td>\(\ddot{x}(t) = {-{\gamma \over m} \cdot \sqrt{v^2_{x}(t) + v^2_{y}(t)} \cdot v_{x}(t)}\)</td>
+                        <td><strong>Differential equation:</strong></td><td>\(\ddot{x}(t) = {-{\gamma \over m} \cdot \sqrt{v^2_{x}(t) + v^2_{y}(t)} \cdot v_{x}(t)}\)</td>
                     </tr>
                     <tr>
-                        <td><strong>y:</strong></td><td>\(\ddot{y}(t) = {-{\gamma \over m} \cdot \sqrt{v^2_{x}(t) + v^2_{y}(t)} \cdot v_{y}(t) - g}\)</td>
+                        <td></td><td>\(\ddot{y}(t) = {-{\gamma \over m} \cdot \sqrt{v^2_{x}(t) + v^2_{y}(t)} \cdot v_{y}(t) - g}\)</td>
                     </tr>
                     <tr>
-                        <td><strong>analytic:</strong></td><td>\(y(x) = -{g \over 2 \cdot v_0^2 \cdot cos^2(\alpha)} \cdot (x - x_0)^2 + tan(\alpha) \cdot (x - x_0) + y_0\)</td>
+                        <td><strong>Analytic:</strong></td><td>\(y(x) = -{g \over 2 \cdot v_0^2 \cdot cos^2(\alpha)} \cdot (x - x_0)^2 + tan(\alpha) \cdot (x - x_0) + y_0\)</td>
                     </tr>
                 </table>
             </p>
