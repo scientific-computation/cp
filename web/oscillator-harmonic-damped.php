@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Computational Science</title>
+        <title>Computational Science - oscillator harmonic damped</title>
 
         <!-- include the header -->
         <?php include('includes/header.php'); ?>
