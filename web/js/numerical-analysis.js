@@ -6,11 +6,13 @@ window.numericalAnalysis = {
      *
      */
     numerov: function(coordinates, initialSettings) {
+        /* use the following energy value to calculate the wave function */
         var E = initialSettings.energyStart;
 
-        var q_i_1 = this.calculateQ(E, 0, initialSettings);
-        var q_i   = this.calculateQ(E, 0, initialSettings);
-        var q_i1  = this.calculateQ(E, 0, initialSettings);
+        /* calculate Q₋₁, Q₀ and Q₊₁ */
+        var q_i_1 = this.calculateQ(E, coordinates.x_i_1, initialSettings);
+        var q_i   = this.calculateQ(E, coordinates.x_i, initialSettings);
+        var q_i1  = this.calculateQ(E, coordinates.x_i1, initialSettings);
 
         var d_x_square = Math.pow(initialSettings.d_x, 2);
 
@@ -65,7 +67,7 @@ window.numericalAnalysis = {
             coordinates.y_i_1 = coordinates.y_i;
             coordinates.y_i   = y_i1;
 
-            /* set new x */
+            /* set new x₋₁, x₀ and x₊₁ */
             coordinates.x_i_1 = coordinates.x_i;
             coordinates.x_i   = coordinates.x_i1;
             coordinates.x_i1 += initialSettings.d_x;
