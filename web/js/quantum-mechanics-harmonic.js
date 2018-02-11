@@ -24,16 +24,19 @@ window.initialSettings = {
     d_x: .01,
 
     /* x: start point x */
-    x: 0,
+    x: -8,
 
     /* x_max: max. x */
-    x_max: 1,
+    x_max: 8,
 
     /* m */
     m: Math.pow(window.constants.h_reduced, 2) / 2,
 
     /* k */
     k: 1 / 2,
+
+    /* omega: ω² = k / m */
+    omega: 0,
 
     /* L: width of potential well */
     L: 1,
@@ -42,10 +45,10 @@ window.initialSettings = {
     energyStart: 0,
 
     /* energy scale */
-    energyScale: 8,
+    energyScale: 1,
 
     /* energy level */
-    energyLevel: 3,
+    energyLevel: 1,
 
     /* V(x): potential function */
     V: function (x) {
@@ -54,7 +57,20 @@ window.initialSettings = {
 
     /* the analytic wave function */
     analyticWaveFunction: function (x, n) {
-        return Math.sqrt(2 / window.initialSettings.L) * Math.sin(n * Math.PI * x / window.initialSettings.L);
+        var part1 = Math.sqrt(1 / (Math.pow(2, n) * math.factorial(n)));
+        var part2 = Math.pow(
+            (window.initialSettings.m * window.initialSettings.omega) / (Math.PI * window.initialSettings.constants.h_reduced),
+            1/4
+        );
+        var part3 = Math.exp(
+            -(window.initialSettings.m * window.initialSettings.omega * Math.pow(x, 2)) / (2 * window.initialSettings.constants.h_reduced)
+        );
+        var part4 = window.numericalAnalysis.calculateHermitePolynomial(
+            n,
+            Math.sqrt(window.initialSettings.m * window.initialSettings.omega / window.initialSettings.constants.h_reduced) * x
+        );
+
+        return part1 * part2 * part3 * part4;
     },
 
     /* the analytic energy eigenvalue function */
@@ -66,7 +82,8 @@ window.initialSettings = {
 
 /* recalculate some initial settings */
 window.initialSettings.constants   = window.constants;
-window.initialSettings.energyStart = window.numericalAnalysis.calculateEnergy(3, initialSettings);
+window.initialSettings.energyStart = window.numericalAnalysis.calculateEnergy(window.initialSettings.energyLevel, window.initialSettings);
+window.initialSettings.omega       = Math.sqrt(window.initialSettings.k / window.initialSettings.m);
 
 /* plotly id */
 window.idDivPlotly = 'graph-quantum-mechanics';
@@ -85,11 +102,11 @@ window.main = function() {
         showlegend: true,
         xaxis: {
             title: 'x',
-            range: [-0.1, 1.1]
+            range: [window.initialSettings.x - 0.1, window.initialSettings.x_max + 0.1]
         },
         yaxis: {
             title: 'V(x) / ' + window.initialSettings.energyScale,
-            range: [-5, 300 / window.initialSettings.energyScale]
+            range: [-0.5, 1 / window.initialSettings.energyScale]
         }
     };
 
@@ -155,14 +172,14 @@ window.calculate = function(initialSettings, tPrecision) {
     var traces = {};
 
     /* prepare the needed traces */
-    traces['trace-e1-numeric'] = window.helper.getDefaultTraceConfig({
-        id: 'trace-e1-numeric',
-        name: String('E%s (numeric)').replace(/%s/g, window.initialSettings.energyLevel)
-    }, 1);
-    traces['trace-e1-numeric-normalized'] = window.helper.getDefaultTraceConfig({
-        id: 'trace-e1-numeric-normalized',
-        name: String('E%s Normalized (numeric)').replace(/%s/g, window.initialSettings.energyLevel)
-    }, 1);
+    // traces['trace-e1-numeric'] = window.helper.getDefaultTraceConfig({
+    //     id: 'trace-e1-numeric',
+    //     name: String('E%s (numeric)').replace(/%s/g, window.initialSettings.energyLevel)
+    // }, 1);
+    // traces['trace-e1-numeric-normalized'] = window.helper.getDefaultTraceConfig({
+    //     id: 'trace-e1-numeric-normalized',
+    //     name: String('E%s Normalized (numeric)').replace(/%s/g, window.initialSettings.energyLevel)
+    // }, 1);
     traces['trace-e1-analytic'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e1-analytic',
         name: 'E1 (analytic)'
@@ -175,31 +192,31 @@ window.calculate = function(initialSettings, tPrecision) {
         id: 'trace-e3-analytic',
         name: 'E3 (analytic)'
     });
-    traces['trace-e4-analytic'] = window.helper.getDefaultTraceConfig({
-        id: 'trace-e4-analytic',
-        name: 'E4 (analytic)'
-    });
-    traces['trace-e5-analytic'] = window.helper.getDefaultTraceConfig({
-        id: 'trace-e5-analytic',
-        name: 'E5 (analytic)'
-    });
+    // traces['trace-e4-analytic'] = window.helper.getDefaultTraceConfig({
+    //     id: 'trace-e4-analytic',
+    //     name: 'E4 (analytic)'
+    // });
+    // traces['trace-e5-analytic'] = window.helper.getDefaultTraceConfig({
+    //     id: 'trace-e5-analytic',
+    //     name: 'E5 (analytic)'
+    // });
 
-    /* Calculates the schrödinger equation with numerov algorithm */
-    var traceNumericRaw = traces['trace-e1-numeric'];
-    window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
-
-    /* copy trace 0 to trace 1 and normalize it to A = 1 */
-    traces['trace-e1-numeric-normalized'].x = traceNumericRaw.x.slice();
-    traces['trace-e1-numeric-normalized'].y = traceNumericRaw.y.slice();
-    window.numericalAnalysis.normalizeTrace(traces['trace-e1-numeric-normalized']);
+    // /* Calculates the schrödinger equation with numerov algorithm */
+    // var traceNumericRaw = traces['trace-e1-numeric'];
+    // window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
+    //
+    // /* copy trace 0 to trace 1 and normalize it to A = 1 */
+    // traces['trace-e1-numeric-normalized'].x = traceNumericRaw.x.slice();
+    // traces['trace-e1-numeric-normalized'].y = traceNumericRaw.y.slice();
+    // window.numericalAnalysis.normalizeTrace(traces['trace-e1-numeric-normalized']);
 
     /* create some five analytic wave function φ_n(x) = √(2/L)⋅sin(n⋅π⋅x/L) | n = 1 .. 5 */
-    for (var n = 1; n <= 5; n++) {
-        var traceKey = Object.keys(traces)[n + 1];
+    for (var n = 0; n <= 2; n++) {
+        var traceKey = Object.keys(traces)[n];
         var trace    = traces[traceKey];
 
-        var current_x = 0;
-        var max_x     = 1;
+        var current_x = window.initialSettings.x;
+        var max_x     = window.initialSettings.x_max;
         do {
             var current_y = initialSettings.analyticWaveFunction(current_x, n);
 
@@ -211,14 +228,14 @@ window.calculate = function(initialSettings, tPrecision) {
     }
 
     /* set energy */
-    for (var n = 1; n <= 5; n++) {
-        var traceKey = Object.keys(traces)[n + 1];
-        var trace    = traces[traceKey];
-
-        window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n, initialSettings) / window.initialSettings.energyScale);
-    }
-    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric'], window.numericalAnalysis.calculateEnergy(3, initialSettings) / window.initialSettings.energyScale);
-    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric-normalized'], window.numericalAnalysis.calculateEnergy(3, initialSettings) / window.initialSettings.energyScale);
+    // for (var n = 0; n <= 0; n++) {
+    //     var traceKey = Object.keys(traces)[n];
+    //     var trace    = traces[traceKey];
+    //
+    //     window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n, initialSettings) / initialSettings.energyScale);
+    // }
+    // window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric'], window.numericalAnalysis.calculateEnergy(initialSettings.energyLevel, initialSettings) / initialSettings.energyScale);
+    // window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric-normalized'], window.numericalAnalysis.calculateEnergy(initialSettings.energyLevel, initialSettings) / initialSettings.energyScale);
 
     /* refresh the output (delete and redraw) */
     for (var key in traces) {

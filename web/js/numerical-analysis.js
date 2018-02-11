@@ -77,6 +77,33 @@ window.numericalAnalysis = {
     },
 
     /**
+     * Calculates the hermite polynomial.
+     *
+     * @param n
+     * @param x
+     * @returns {number}
+     */
+    calculateHermitePolynomial: function (n, x) {
+        switch (n) {
+            case 0:
+                return 1;
+                break;
+
+            case 1:
+                return 2 * x;
+                break;
+
+            case 2:
+                return 4 * Math.pow(x, 2) - 2;
+                break;
+
+            default:
+                console.error('unsupported hermite polynomial: ' + n);
+                break;
+        }
+    },
+
+    /**
      * Calculates Q from φ''(x) = -Q(x)⋅φ(x)
      *
      * @param E
