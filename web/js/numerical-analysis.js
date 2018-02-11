@@ -49,7 +49,7 @@ window.numericalAnalysis = {
         trace.y.push(coordinates.y_i);
 
         /* calculate the y₊₁ points */
-        var zeroCounter = 0;
+        var zeroCounter = -1;
         do {
             /* calculate y₊₁ */
             var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
@@ -114,6 +114,19 @@ window.numericalAnalysis = {
     calculateQ: function (E, x, initialSettings) {
         var V = initialSettings.V;
         return 2 * initialSettings.m / Math.pow(initialSettings.constants.h_reduced, 2) * (E - V(x));
+    },
+
+    /**
+     * Calculates Q from φ''(x) = -Q(x)⋅φ(x)
+     *
+     * @param E
+     * @param x
+     * @param initialSettings
+     * @returns {number}
+     */
+    calculateQ0: function (E, x, initialSettings) {
+        var V = initialSettings.V;
+        return 2 * initialSettings.m / Math.pow(initialSettings.constants.h_reduced, 2) * (V(x) - E);
     },
 
     /**
