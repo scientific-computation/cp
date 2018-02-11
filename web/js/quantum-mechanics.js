@@ -29,7 +29,10 @@ window.initialSettings = {
     energyStart:  window.numericalAnalysis.calculateEnergy(3),
 
     /* energy scale */
-    energyScale: 8
+    energyScale: 8,
+
+    /* energy level */
+    energyLevel: 3
 };
 
 /* plotly id */
@@ -121,11 +124,11 @@ window.calculate = function(initialSettings, tPrecision) {
     /* prepare the needed traces */
     traces['trace-e1-numeric'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e1-numeric',
-        name: 'E3 (numeric)'
+        name: String('E%s (numeric)').replace(/%s/g, window.initialSettings.energyLevel)
     }, 1);
     traces['trace-e1-numeric-normalized'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e1-numeric-normalized',
-        name: 'E3 Normalized (numeric)'
+        name: String('E%s Normalized (numeric)').replace(/%s/g, window.initialSettings.energyLevel)
     }, 1);
     traces['trace-e1-analytic'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e1-analytic',
@@ -148,45 +151,9 @@ window.calculate = function(initialSettings, tPrecision) {
         name: 'E5 (analytic)'
     });
 
-    /* set x to 0 */
-    var coordinates = {
-        x: initialSettings.x,
-        y_i_1: initialSettings.y_i_1,
-        y_i: initialSettings.y_i
-    };
-
+    /* Calculates the schrödinger equation with numerov algorithm */
     var traceNumericRaw = traces['trace-e1-numeric'];
-
-    traceNumericRaw.x.push(coordinates.x);
-    traceNumericRaw.y.push(coordinates.y_i_1);
-    coordinates.x += initialSettings.d_x;
-
-    traceNumericRaw.x.push(coordinates.x);
-    traceNumericRaw.y.push(coordinates.y_i);
-    coordinates.x += initialSettings.d_x;
-
-    var zeroCounter = 0;
-
-    do {
-        /* calculate y₊₁ */
-        var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
-
-        /* Checks if the new value differ in sign and count this issue. */
-        if (window.numericalAnalysis.algebraicSignHasChanged(coordinates.y_i, y_i1)) {
-            zeroCounter++;
-        }
-
-        /* save calculated value to current trace */
-        traceNumericRaw.x.push(coordinates.x);
-        traceNumericRaw.y.push(y_i1);
-
-        /* set new y₋₁ and y₀ */
-        coordinates.y_i_1 = coordinates.y_i;
-        coordinates.y_i   = y_i1;
-
-        /* set new x */
-        coordinates.x += initialSettings.d_x;
-    } while (zeroCounter < 3);
+    window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
 
     /* copy trace 0 to trace 1 and normalize it to A = 1 */
     traces['trace-e1-numeric-normalized'].x = traceNumericRaw.x.slice();

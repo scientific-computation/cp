@@ -2,7 +2,6 @@ window.numericalAnalysis = {
     /**
      * Calculates the next psi step with numerov method.
      *
-     *
      */
     numerov: function(coordinates, initialSettings) {
         var q_i_1 = initialSettings.energyStart;
@@ -16,6 +15,55 @@ window.numericalAnalysis = {
         var value3 = 1 + q_i1 * d_x_square / 12;
 
         return (value1 - value2) / value3;
+    },
+
+    /**
+     * Solves the schrödinger equation with the numerical numerov algorithm.
+     * Save it to given trace.
+     *
+     * @param initialSettings
+     */
+    numerovHelper: function (trace, initialSettings) {
+
+        /* build coordinates object */
+        var coordinates = {
+            x: initialSettings.x,
+            y_i_1: initialSettings.y_i_1,
+            y_i: initialSettings.y_i
+        };
+
+        trace.x.push(coordinates.x);
+        trace.y.push(coordinates.y_i_1);
+        coordinates.x += initialSettings.d_x;
+
+        trace.x.push(coordinates.x);
+        trace.y.push(coordinates.y_i);
+        coordinates.x += initialSettings.d_x;
+
+        var zeroCounter = 0;
+
+        do {
+            /* calculate y₊₁ */
+            var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
+
+            /* Checks if the new value differ in sign and count this issue. */
+            if (window.numericalAnalysis.algebraicSignHasChanged(coordinates.y_i, y_i1)) {
+                zeroCounter++;
+            }
+
+            /* save calculated value to current trace */
+            trace.x.push(coordinates.x);
+            trace.y.push(y_i1);
+
+            /* set new y₋₁ and y₀ */
+            coordinates.y_i_1 = coordinates.y_i;
+            coordinates.y_i   = y_i1;
+
+            /* set new x */
+            coordinates.x += initialSettings.d_x;
+        } while (zeroCounter < initialSettings.energyLevel);
+
+        return trace;
     },
 
     /**
