@@ -22,6 +22,9 @@ window.initialSettings = {
     /* x: start point x */
     x: 0,
 
+    /* x_max: max. x */
+    x_max: 1,
+
     /* E = (n²⋅π²⋅ℏ²)/(2⋅m⋅L) | m = ℏ²/2 ∧ L = 1 ∧ n = 3 */
     energy:  window.numericalAnalysis.calculateEnergy(3)
 };
@@ -43,7 +46,7 @@ window.main = function() {
         showlegend: true,
         xaxis: {
             title: 'x',
-            range: [-0.5, 1.5]
+            range: [-0.1, 1.1]
         },
         yaxis: {
             title: 'V(x) / 4',
@@ -110,51 +113,53 @@ window.traceCounter = 0;
 window.calculate = function(initialSettings, tPrecision) {
 
     /* initialize the trace container */
-    var traces = [];
+    var traces = {};
 
     /* prepare the needed traces */
-    traces.push(window.helper.getDefaultTraceConfig({
+    traces['trace-e1-numeric'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e1-numeric',
         name: 'E3 (numeric)'
-    }, 1));
-    traces.push(window.helper.getDefaultTraceConfig({
+    }, 1);
+    traces['trace-e1-numeric-normalized'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e1-numeric-normalized',
         name: 'E3 Normalized (numeric)'
-    }, 1));
-    traces.push(window.helper.getDefaultTraceConfig({
+    }, 1);
+    traces['trace-e1-analytic'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e1-analytic',
         name: 'E1 (analytic)'
-    }));
-    traces.push(window.helper.getDefaultTraceConfig({
+    });
+    traces['trace-e2-analytic'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e2-analytic',
         name: 'E2 (analytic)'
-    }));
-    traces.push(window.helper.getDefaultTraceConfig({
+    });
+    traces['trace-e3-analytic'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e3-analytic',
         name: 'E3 (analytic)'
-    }));
-    traces.push(window.helper.getDefaultTraceConfig({
+    });
+    traces['trace-e4-analytic'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e4-analytic',
         name: 'E4 (analytic)'
-    }));
-    traces.push(window.helper.getDefaultTraceConfig({
+    });
+    traces['trace-e5-analytic'] = window.helper.getDefaultTraceConfig({
         id: 'trace-e5-analytic',
         name: 'E5 (analytic)'
-    }));
+    });
 
     /* set x to 0 */
     var coordinates = {
-        x: 0,
+        x: initialSettings.x,
         y_i_1: initialSettings.y_i_1,
         y_i: initialSettings.y_i
     };
 
-    traces[0].x.push(coordinates.x);
-    traces[0].y.push(coordinates.y_i_1);
+    var traceNumericRaw = traces['trace-e1-numeric'];
+
+    traceNumericRaw.x.push(coordinates.x);
+    traceNumericRaw.y.push(coordinates.y_i_1);
     coordinates.x += initialSettings.d_x;
 
-    traces[0].x.push(coordinates.x);
-    traces[0].y.push(coordinates.y_i);
+    traceNumericRaw.x.push(coordinates.x);
+    traceNumericRaw.y.push(coordinates.y_i);
     coordinates.x += initialSettings.d_x;
 
     var zeroCounter = 0;
@@ -163,8 +168,8 @@ window.calculate = function(initialSettings, tPrecision) {
     do {
         var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings, initialSettings.d_x, coordinates.y_i_1, coordinates.y_i, initialSettings.energy);
 
-        traces[0].x.push(coordinates.x);
-        traces[0].y.push(y_i1);
+        traceNumericRaw.x.push(coordinates.x);
+        traceNumericRaw.y.push(y_i1);
         coordinates.x += initialSettings.d_x;
 
         coordinates.y_i_1 = coordinates.y_i;
@@ -184,31 +189,38 @@ window.calculate = function(initialSettings, tPrecision) {
     } while (zeroCounter < 3);
 
     /* copy trace 0 to trace 1 and normalize it to A = 1 */
-    traces[1].x = traces[0].x.slice();
-    traces[1].y = traces[0].y.slice();
-    window.numericalAnalysis.normalizeTrace(traces[1]);
+    traces['trace-e1-numeric-normalized'].x = traceNumericRaw.x.slice();
+    traces['trace-e1-numeric-normalized'].y = traceNumericRaw.y.slice();
+    window.numericalAnalysis.normalizeTrace(traces['trace-e1-numeric-normalized']);
 
     /* create some five analytic wave function φ_n(x) = √(2/L)⋅sin(n⋅π⋅x/L) | n = 1 .. 5 */
     for (var n = 1; n <= 5; n++) {
+        var traceKey = Object.keys(traces)[n + 1];
+        var trace    = traces[traceKey];
+
         var current_x = 0;
-        var max_x = 1;
+        var max_x     = 1;
         do {
-            traces[n + 1].x.push(current_x);
-            traces[n + 1].y.push(Math.sqrt(2) * Math.sin(n * Math.PI * current_x));
+            trace.x.push(current_x);
+            trace.y.push(Math.sqrt(2) * Math.sin(n * Math.PI * current_x));
 
             current_x += initialSettings.d_x;
         } while (current_x < max_x);
-
-        window.numericalAnalysis.moveTraceY(traces[n + 1], window.numericalAnalysis.calculateEnergy(n) / 4);
     }
 
-    window.numericalAnalysis.moveTraceY(traces[0], window.numericalAnalysis.calculateEnergy(3) / 4);
-    window.numericalAnalysis.moveTraceY(traces[1], window.numericalAnalysis.calculateEnergy(3) / 4);
+    /* set energy */
+    for (var n = 1; n <= 5; n++) {
+        var traceKey = Object.keys(traces)[n + 1];
+        var trace    = traces[traceKey];
 
+        window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n) / 4);
+    }
+    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric'], window.numericalAnalysis.calculateEnergy(3) / 4);
+    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric-normalized'], window.numericalAnalysis.calculateEnergy(3) / 4);
 
     /* refresh the output (delete and redraw) */
-    for (var index in traces) {
-        var trace = traces[index];
+    for (var key in traces) {
+        var trace = traces[key];
 
         window.helper.deleteTrace(window.idDivPlotly, trace.id);
         Plotly.addTraces(window.idDivPlotly, trace);

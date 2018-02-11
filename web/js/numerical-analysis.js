@@ -2,6 +2,7 @@ window.numericalAnalysis = {
     /**
      * Calculates the next psi step with numerov method.
      *
+     *
      */
     numerov: function(coordinates, initialSettings) {
         var q_i_1 = initialSettings.energy;
