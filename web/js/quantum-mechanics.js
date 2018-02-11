@@ -10,35 +10,24 @@ window.tPrecision = 0.01;
 
 /* some initial motion equation values */
 window.initialSettings = {
-    y_i_1:   0,
-    y_i:     .2,
-    energy:  9 * Math.pow(Math.PI, 2),
-    d_x:     .01,
-    x:       0
+    /* y₋₁: first step */
+    y_i_1: 0,
+
+    /* y₀: next step */
+    y_i: .3,
+
+    /* Δx: step width */
+    d_x: .01,
+
+    /* x: start point x */
+    x: 0,
+
+    /* E = (n²⋅π²⋅ℏ²)/(2⋅m⋅L) | m = ℏ²/2 ∧ L = 1 ∧ n = 3 */
+    energy:  window.numericalAnalysis.calculateEnergy(3)
 };
 
 /* plotly id */
 window.idDivPlotly = 'graph-quantum-mechanics';
-
-/**
- * Calculates the next psi step with numerov method.
- *
- */
-window.numerow = function(d_x, x_i_1, x_i, energie) {
-    var q_i_1 = energie;
-    var q_i   = energie;
-    var q_i1  = energie;
-
-    var d_x_square = Math.pow(d_x, 2);
-
-    var value1 = (2 - 5/6 * q_i * d_x_square) * x_i;
-    var value2 = (1 + q_i_1 * d_x_square / 12) * x_i_1;
-    var value3 = 1 + q_i1 * d_x_square / 12;
-
-//console.log(value1, value2, value3);
-
-    return (value1 - value2) / value3;    
-};
 
 /**
  * Main start function.
@@ -57,8 +46,8 @@ window.main = function() {
             range: [-0.5, 1.5]
         },
         yaxis: {
-            title: 'V(x)',
-            range: [-15, 15]
+            title: 'V(x) / 4',
+            range: [-5, 70]
         }
     };
 
@@ -78,7 +67,7 @@ window.main = function() {
     window.calculate(window.initialSettings, window.tPrecision);
 
     document.getElementById('equation-settings').addEventListener(
-        'submit', 
+        'submit',
         function (evt) {
             window.initialiseSettings();
             window.calculate(window.initialSettings, window.tPrecision);
@@ -86,33 +75,6 @@ window.main = function() {
     	    evt.preventDefault();
         }
     );
-};
-
-/**
- * Delete trace helper.
- *
- * @version 1.0 (2018-01-30)
- * @author  Björn Hempel <bjoern@hempel.li>
- */
-window.deleteTrace = function(idPlotly, idTrace) {
-    if (document.getElementById(idPlotly) === null) {
-        return false;
-    }
-
-    var data     = document.getElementById(idPlotly).data;
-    var deleteId = -1;
-
-    for (var i = 0; i < data.length; i++) {
-        if (data[i].id === idTrace) {
-            deleteId = i;
-        }
-    }
-
-    if (deleteId < 0) {
-        return false;
-    }
-
-    return Plotly.deleteTraces(idPlotly, deleteId);
 };
 
 /**
@@ -140,79 +102,6 @@ window.initialiseSettings = function() {
 window.traceCounter = 0;
 
 /**
- * Returns an initial config array for a trace.
- *
- * @version 1.0 (2018-01-30)
- * @author  Björn Hempel <bjoern@hempel.li>
- */
-window.getDefaultTraceConfig = function(config, traceWidthAdd, traceOpacityAdd) {
-    var defaultTraceOpacity = 1.0;
-    var defaultTraceWidth   = 1;
-
-    var config = typeof config === "object" ? config : {};
-
-    window.traceCounter++;
-
-    var defaultTraceConfig = {
-        x: [],
-        y: [],
-        id: 'trace-' + window.traceCounter,
-        name: 'Trace ' + window.traceCounter,
-        type: 'scatter',
-        opacity: defaultTraceOpacity,
-        line: {
-            width: defaultTraceWidth
-        }
-    };
-
-    if (traceWidthAdd) {
-        defaultTraceConfig.line.width += traceWidthAdd;
-    }
-
-    if (traceOpacityAdd) {
-        defaultTraceConfig.opacity += traceOpacityAdd;
-    }
-
-    var traceConfig = $.extend(true, {}, defaultTraceConfig, config);
-
-    return traceConfig;
-};
-
-/**
- * Calculates the area of given y1 and y1+1 with given width (dx).
- *
- * @param d_x
- * @param y_i
- * @param y_i1
- * @returns {number}
- */
-window.calculateArea = function (d_x, y_i, y_i1) {
-    return (y_i + y_i1) / 2 * d_x;
-}
-
-/**
- * Normalize the given trace (1 = ∫Ψ²dx)
- *
- * @param trace
- */
-window.normalizeTrace = function (trace) {
-
-    var d_x = .01;
-    var area = 0;
-
-    for (var i = 1; i < trace.y.length; i++) {
-        area += window.calculateArea(d_x, Math.pow(trace.y[i - 1], 2), Math.pow(trace.y[i], 2));
-    }
-
-    console.log('A² = ' + area);
-    console.log('A = ' + Math.sqrt(area));
-
-    for (var i = 0; i < trace.y.length; i++) {
-        trace.y[i] /= Math.sqrt(area);
-    }
-};
-
-/**
  * The numeric calculator.
  *
  * @version 1.0 (2018-01-30)
@@ -224,70 +113,83 @@ window.calculate = function(initialSettings, tPrecision) {
     var traces = [];
 
     /* prepare the needed traces */
-    traces.push(window.getDefaultTraceConfig({
+    traces.push(window.helper.getDefaultTraceConfig({
         id: 'trace-e1-numeric',
-        name: 'E1 (numeric)'
+        name: 'E3 (numeric)'
     }, 1));
-    traces.push(window.getDefaultTraceConfig({
+    traces.push(window.helper.getDefaultTraceConfig({
         id: 'trace-e1-numeric-normalized',
-        name: 'E1 Normalized (numeric)'
+        name: 'E3 Normalized (numeric)'
     }, 1));
-    traces.push(window.getDefaultTraceConfig({
+    traces.push(window.helper.getDefaultTraceConfig({
         id: 'trace-e1-analytic',
         name: 'E1 (analytic)'
     }));
-    traces.push(window.getDefaultTraceConfig({
+    traces.push(window.helper.getDefaultTraceConfig({
         id: 'trace-e2-analytic',
         name: 'E2 (analytic)'
     }));
-    traces.push(window.getDefaultTraceConfig({
+    traces.push(window.helper.getDefaultTraceConfig({
         id: 'trace-e3-analytic',
         name: 'E3 (analytic)'
     }));
+    traces.push(window.helper.getDefaultTraceConfig({
+        id: 'trace-e4-analytic',
+        name: 'E4 (analytic)'
+    }));
+    traces.push(window.helper.getDefaultTraceConfig({
+        id: 'trace-e5-analytic',
+        name: 'E5 (analytic)'
+    }));
 
     /* set x to 0 */
-    initialSettings.x = 0;
+    var coordinates = {
+        x: 0,
+        y_i_1: initialSettings.y_i_1,
+        y_i: initialSettings.y_i
+    };
 
-    traces[0].x.push(initialSettings.x);
-    traces[0].y.push(initialSettings.y_i_1);
-    initialSettings.x += initialSettings.d_x;
+    traces[0].x.push(coordinates.x);
+    traces[0].y.push(coordinates.y_i_1);
+    coordinates.x += initialSettings.d_x;
 
-    traces[0].x.push(initialSettings.x);
-    traces[0].y.push(initialSettings.y_i);
-    initialSettings.x += initialSettings.d_x;
+    traces[0].x.push(coordinates.x);
+    traces[0].y.push(coordinates.y_i);
+    coordinates.x += initialSettings.d_x;
 
     var zeroCounter = 0;
     var currentAlgebraicSign = true;
 
     do {
-        var y_i1 = window.numerow(initialSettings.d_x, initialSettings.y_i_1, initialSettings.y_i, initialSettings.energy);
+        var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings, initialSettings.d_x, coordinates.y_i_1, coordinates.y_i, initialSettings.energy);
 
-        traces[0].x.push(initialSettings.x);
+        traces[0].x.push(coordinates.x);
         traces[0].y.push(y_i1);
-        initialSettings.x += initialSettings.d_x;
+        coordinates.x += initialSettings.d_x;
 
-        initialSettings.y_i_1 = initialSettings.y_i;
-        initialSettings.y_i   = y_i1;
+        coordinates.y_i_1 = coordinates.y_i;
+        coordinates.y_i   = y_i1;
 
         if (currentAlgebraicSign) {
-            if (initialSettings.y_i < 0) {
+            if (coordinates.y_i < 0) {
                 zeroCounter++;
                 currentAlgebraicSign = false;
             }
         } else {
-            if (initialSettings.y_i > 0) {
+            if (coordinates.y_i > 0) {
                 zeroCounter++;
                 currentAlgebraicSign = true;
             }
         }
     } while (zeroCounter < 3);
 
+    /* copy trace 0 to trace 1 and normalize it to A = 1 */
     traces[1].x = traces[0].x.slice();
     traces[1].y = traces[0].y.slice();
+    window.numericalAnalysis.normalizeTrace(traces[1]);
 
-    window.normalizeTrace(traces[1]);
-
-    for (var n = 1; n <= 3; n++) {
+    /* create some five analytic wave function φ_n(x) = √(2/L)⋅sin(n⋅π⋅x/L) | n = 1 .. 5 */
+    for (var n = 1; n <= 5; n++) {
         var current_x = 0;
         var max_x = 1;
         do {
@@ -296,13 +198,19 @@ window.calculate = function(initialSettings, tPrecision) {
 
             current_x += initialSettings.d_x;
         } while (current_x < max_x);
+
+        window.numericalAnalysis.moveTraceY(traces[n + 1], window.numericalAnalysis.calculateEnergy(n) / 4);
     }
+
+    window.numericalAnalysis.moveTraceY(traces[0], window.numericalAnalysis.calculateEnergy(3) / 4);
+    window.numericalAnalysis.moveTraceY(traces[1], window.numericalAnalysis.calculateEnergy(3) / 4);
+
 
     /* refresh the output (delete and redraw) */
     for (var index in traces) {
         var trace = traces[index];
 
-        window.deleteTrace(window.idDivPlotly, trace.id);
+        window.helper.deleteTrace(window.idDivPlotly, trace.id);
         Plotly.addTraces(window.idDivPlotly, trace);
     }
 };
