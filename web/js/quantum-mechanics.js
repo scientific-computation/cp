@@ -26,7 +26,10 @@ window.initialSettings = {
     x_max: 1,
 
     /* E = (n²⋅π²⋅ℏ²)/(2⋅m⋅L) | m = ℏ²/2 ∧ L = 1 ∧ n = 3 */
-    energy:  window.numericalAnalysis.calculateEnergy(3)
+    energy:  window.numericalAnalysis.calculateEnergy(3),
+
+    /* energy scale */
+    energyScale: 8
 };
 
 /* plotly id */
@@ -49,8 +52,8 @@ window.main = function() {
             range: [-0.1, 1.1]
         },
         yaxis: {
-            title: 'V(x) / 4',
-            range: [-5, 70]
+            title: 'V(x) / ' + window.initialSettings.energyScale,
+            range: [-5, 300 / window.initialSettings.energyScale]
         }
     };
 
@@ -213,10 +216,10 @@ window.calculate = function(initialSettings, tPrecision) {
         var traceKey = Object.keys(traces)[n + 1];
         var trace    = traces[traceKey];
 
-        window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n) / 4);
+        window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n) / window.initialSettings.energyScale);
     }
-    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric'], window.numericalAnalysis.calculateEnergy(3) / 4);
-    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric-normalized'], window.numericalAnalysis.calculateEnergy(3) / 4);
+    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric'], window.numericalAnalysis.calculateEnergy(3) / window.initialSettings.energyScale);
+    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric-normalized'], window.numericalAnalysis.calculateEnergy(3) / window.initialSettings.energyScale);
 
     /* refresh the output (delete and redraw) */
     for (var key in traces) {
