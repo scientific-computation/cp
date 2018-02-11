@@ -10,14 +10,11 @@ window.tPrecision = 0.01;
 
 /* some initial motion equation values */
 window.initialSettings = {
-    m:     1.0,
-    gamma: 0.1,
-    x0:    0.0,
-    g:     10.0,
-    v0:    10.0,
-    x0:    0.0,
-    y0:    10.0,
-    alpha: 0.8
+    y_i_1:   0,
+    y_i:     .2,
+    energy:  9 * Math.pow(Math.PI, 2),
+    d_x:     .01,
+    x:       0
 };
 
 /* plotly id */
@@ -181,10 +178,23 @@ window.getDefaultTraceConfig = function(config, traceWidthAdd, traceOpacityAdd) 
     return traceConfig;
 };
 
+/**
+ * Calculates the area of given y1 and y1+1 with given width (dx).
+ *
+ * @param d_x
+ * @param y_i
+ * @param y_i1
+ * @returns {number}
+ */
 window.calculateArea = function (d_x, y_i, y_i1) {
     return (y_i + y_i1) / 2 * d_x;
 }
 
+/**
+ * Normalize the given trace (1 = ∫Ψ²dx)
+ *
+ * @param trace
+ */
 window.normalizeTrace = function (trace) {
 
     var d_x = .01;
@@ -235,40 +245,37 @@ window.calculate = function(initialSettings, tPrecision) {
         name: 'E3 (analytic)'
     }));
 
-    var y_i_1  = 0;
-    var y_i    = .2;
-    var energy = 9 * Math.pow(Math.PI, 2);
     var d_x    = .01;
     var x      = 0;
 
     traces[0].x.push(x);
-    traces[0].y.push(y_i_1);
+    traces[0].y.push(initialSettings.y_i_1);
     x += d_x;
 
     traces[0].x.push(x);
-    traces[0].y.push(y_i);
+    traces[0].y.push(initialSettings.y_i);
     x += d_x;
 
     var zeroCounter = 0;
     var currentAlgebraicSign = true;
 
     do {
-        var y_i1 = window.numerow(d_x, y_i_1, y_i, energy);
+        var y_i1 = window.numerow(d_x, initialSettings.y_i_1, initialSettings.y_i, initialSettings.energy);
 
         traces[0].x.push(x);
         traces[0].y.push(y_i1);
         x += d_x;
 
-        var y_i_1 = y_i;
-        var y_i   = y_i1;
+        initialSettings.y_i_1 = initialSettings.y_i;
+        initialSettings.y_i   = y_i1;
 
         if (currentAlgebraicSign) {
-            if (y_i < 0) {
+            if (initialSettings.y_i < 0) {
                 zeroCounter++;
                 currentAlgebraicSign = false;
             }
         } else {
-            if (y_i > 0) {
+            if (initialSettings.y_i > 0) {
                 zeroCounter++;
                 currentAlgebraicSign = true;
             }
@@ -290,15 +297,9 @@ window.calculate = function(initialSettings, tPrecision) {
             traces[n + 1].x.push(current_x);
             traces[n + 1].y.push(Math.sqrt(2) * Math.sin(n * Math.PI * current_x));
 
-            current_x += d_x;        
+            current_x += d_x;
         } while (current_x < max_x);
     }
-
-
-
-
-
-
 
     /* refresh the output (delete and redraw) */
     for (var index in traces) {
