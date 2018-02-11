@@ -15,7 +15,8 @@
         </ul>
         <h1>Quantum mechanics</h1>
         <ul>
-            <li><a href="/quantum-mechanics.html">Quantum mechanics I</a></li>
+            <li><a href="/quantum-mechanics.html">Quantum mechanics I (Particle in a box)</a></li>
+            <li><a href="/quantum-mechanics-harmonic.html">Quantum mechanics II (quantum harmonic oscillator)</a></li>
         </ul>
     </body>
 </html>
