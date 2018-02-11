@@ -32,13 +32,11 @@ window.initialSettings = {
     /* m */
     m: Math.pow(window.constants.h_reduced, 2) / 2,
 
+    /* k */
+    k: 1 / 2,
+
     /* L: width of potential well */
     L: 1,
-
-    /* potential function */
-    V: function (x) {
-        return 0 * x;
-    },
 
     /* E = (n²⋅π²⋅ℏ²)/(2⋅m⋅L) | m = ℏ²/2 ∧ L = 1 ∧ n = 3 */
     energyStart: 0,
@@ -47,7 +45,23 @@ window.initialSettings = {
     energyScale: 8,
 
     /* energy level */
-    energyLevel: 3
+    energyLevel: 3,
+
+    /* V(x): potential function */
+    V: function (x) {
+        return 0 * x;
+    },
+
+    /* the analytic wave function */
+    analyticWaveFunction: function (x, n) {
+        return Math.sqrt(2 / window.initialSettings.L) * Math.sin(n * Math.PI * x / window.initialSettings.L);
+    },
+
+    /* the analytic energy eigenvalue function */
+    analyticEnergyFunction: function (n) {
+        return (Math.pow(n, 2) * Math.pow(Math.PI, 2) * Math.pow(window.initialSettings.constants.h_reduced, 2)) /
+            (2 * window.initialSettings.m * Math.pow(window.initialSettings.L, 2));
+    }
 };
 
 /* recalculate some initial settings */
@@ -187,8 +201,10 @@ window.calculate = function(initialSettings, tPrecision) {
         var current_x = 0;
         var max_x     = 1;
         do {
+            var current_y = initialSettings.analyticWaveFunction(current_x, n);
+
             trace.x.push(current_x);
-            trace.y.push(Math.sqrt(2) * Math.sin(n * Math.PI * current_x));
+            trace.y.push(current_y);
 
             current_x += initialSettings.d_x;
         } while (current_x < max_x);

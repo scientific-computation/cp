@@ -139,7 +139,7 @@ window.numericalAnalysis = {
      * E = (n²⋅π²⋅ℏ²)/(2⋅m⋅L) | m = ℏ²/2 ∧ L = 1
      */
     calculateEnergy: function (n, initialSettings) {
-        return (Math.pow(n, 2) * Math.pow(Math.PI, 2) * Math.pow(initialSettings.constants.h_reduced, 2)) / (2 * initialSettings.m * Math.pow(initialSettings.L, 2));
+        return initialSettings.analyticEnergyFunction(n);
     },
 
     /**
