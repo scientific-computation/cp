@@ -5,9 +5,9 @@ window.numericalAnalysis = {
      *
      */
     numerov: function(coordinates, initialSettings) {
-        var q_i_1 = initialSettings.energy;
-        var q_i   = initialSettings.energy;
-        var q_i1  = initialSettings.energy;
+        var q_i_1 = initialSettings.energyStart;
+        var q_i   = initialSettings.energyStart;
+        var q_i1  = initialSettings.energyStart;
 
         var d_x_square = Math.pow(initialSettings.d_x, 2);
 
@@ -69,5 +69,21 @@ window.numericalAnalysis = {
      */
     calculateEnergy: function (n) {
         return Math.pow(n, 2) * Math.pow(Math.PI, 2);
+    },
+
+    /**
+     * Checks if the given numbers differ in sign.
+     *
+     * @param x1
+     * @param x2
+     */
+    algebraicSignHasChanged: function (x1, x2) {
+        var algebraicSign1 = Math.sign(x1);
+        var algebraicSign2 = Math.sign(x2);
+
+        algebraicSign1 = algebraicSign1 === 0 ? 1 : algebraicSign1;
+        algebraicSign2 = algebraicSign2 === 0 ? 1 : algebraicSign2;
+
+        return algebraicSign1 !== algebraicSign2;
     }
 };

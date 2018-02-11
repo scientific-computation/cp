@@ -26,7 +26,7 @@ window.initialSettings = {
     x_max: 1,
 
     /* E = (n²⋅π²⋅ℏ²)/(2⋅m⋅L) | m = ℏ²/2 ∧ L = 1 ∧ n = 3 */
-    energy:  window.numericalAnalysis.calculateEnergy(3),
+    energyStart:  window.numericalAnalysis.calculateEnergy(3),
 
     /* energy scale */
     energyScale: 8
@@ -166,29 +166,26 @@ window.calculate = function(initialSettings, tPrecision) {
     coordinates.x += initialSettings.d_x;
 
     var zeroCounter = 0;
-    var currentAlgebraicSign = true;
 
     do {
-        var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings, initialSettings.d_x, coordinates.y_i_1, coordinates.y_i, initialSettings.energy);
+        /* calculate y₊₁ */
+        var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
 
+        /* Checks if the new value differ in sign and count this issue. */
+        if (window.numericalAnalysis.algebraicSignHasChanged(coordinates.y_i, y_i1)) {
+            zeroCounter++;
+        }
+
+        /* save calculated value to current trace */
         traceNumericRaw.x.push(coordinates.x);
         traceNumericRaw.y.push(y_i1);
-        coordinates.x += initialSettings.d_x;
 
+        /* set new y₋₁ and y₀ */
         coordinates.y_i_1 = coordinates.y_i;
         coordinates.y_i   = y_i1;
 
-        if (currentAlgebraicSign) {
-            if (coordinates.y_i < 0) {
-                zeroCounter++;
-                currentAlgebraicSign = false;
-            }
-        } else {
-            if (coordinates.y_i > 0) {
-                zeroCounter++;
-                currentAlgebraicSign = true;
-            }
-        }
+        /* set new x */
+        coordinates.x += initialSettings.d_x;
     } while (zeroCounter < 3);
 
     /* copy trace 0 to trace 1 and normalize it to A = 1 */
