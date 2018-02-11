@@ -1,12 +1,16 @@
 window.numericalAnalysis = {
+
+
     /**
      * Calculates the next psi step with numerov method.
      *
      */
     numerov: function(coordinates, initialSettings) {
-        var q_i_1 = initialSettings.energyStart;
-        var q_i   = initialSettings.energyStart;
-        var q_i1  = initialSettings.energyStart;
+        var E = initialSettings.energyStart;
+
+        var q_i_1 = this.calculateQ(E, 0, initialSettings);
+        var q_i   = this.calculateQ(E, 0, initialSettings);
+        var q_i1  = this.calculateQ(E, 0, initialSettings);
 
         var d_x_square = Math.pow(initialSettings.d_x, 2);
 
@@ -27,21 +31,23 @@ window.numericalAnalysis = {
 
         /* build coordinates object */
         var coordinates = {
-            x: initialSettings.x,
+            x_i_1: initialSettings.x,
+            x_i: initialSettings.x + initialSettings.d_x,
+            x_i1: initialSettings.x + 2 * initialSettings.d_x,
             y_i_1: initialSettings.y_i_1,
             y_i: initialSettings.y_i
         };
 
-        trace.x.push(coordinates.x);
+        /* calculate the y₋₁ point */
+        trace.x.push(coordinates.x_i_1);
         trace.y.push(coordinates.y_i_1);
-        coordinates.x += initialSettings.d_x;
 
-        trace.x.push(coordinates.x);
+        /* calculate the y₀ point */
+        trace.x.push(coordinates.x_i);
         trace.y.push(coordinates.y_i);
-        coordinates.x += initialSettings.d_x;
 
+        /* calculate the y₊₁ points */
         var zeroCounter = 0;
-
         do {
             /* calculate y₊₁ */
             var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
@@ -52,7 +58,7 @@ window.numericalAnalysis = {
             }
 
             /* save calculated value to current trace */
-            trace.x.push(coordinates.x);
+            trace.x.push(coordinates.x_i1);
             trace.y.push(y_i1);
 
             /* set new y₋₁ and y₀ */
@@ -60,10 +66,25 @@ window.numericalAnalysis = {
             coordinates.y_i   = y_i1;
 
             /* set new x */
-            coordinates.x += initialSettings.d_x;
+            coordinates.x_i_1 = coordinates.x_i;
+            coordinates.x_i   = coordinates.x_i1;
+            coordinates.x_i1 += initialSettings.d_x;
         } while (zeroCounter < initialSettings.energyLevel);
 
         return trace;
+    },
+
+    /**
+     * Calculates Q from φ''(x) = -Q(x)⋅φ(x)
+     *
+     * @param E
+     * @param x
+     * @param initialSettings
+     * @returns {number}
+     */
+    calculateQ: function (E, x, initialSettings) {
+        var V = initialSettings.V;
+        return 2 * initialSettings.m / Math.pow(initialSettings.constants.h_reduced, 2) * (E - V(x));
     },
 
     /**
@@ -115,8 +136,8 @@ window.numericalAnalysis = {
     /**
      * E = (n²⋅π²⋅ℏ²)/(2⋅m⋅L) | m = ℏ²/2 ∧ L = 1
      */
-    calculateEnergy: function (n) {
-        return Math.pow(n, 2) * Math.pow(Math.PI, 2);
+    calculateEnergy: function (n, initialSettings) {
+        return (Math.pow(n, 2) * Math.pow(Math.PI, 2) * Math.pow(initialSettings.constants.h_reduced, 2)) / (2 * initialSettings.m * Math.pow(initialSettings.L, 2));
     },
 
     /**

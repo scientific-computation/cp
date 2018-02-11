@@ -8,6 +8,10 @@
 /* some initial calculation values */
 window.tPrecision = 0.01;
 
+window.constants = {
+    h_reduced: 6.626070040 / (2 * Math.PI), /* 10⁻³⁴ */
+};
+
 /* some initial motion equation values */
 window.initialSettings = {
     /* y₋₁: first step */
@@ -25,8 +29,19 @@ window.initialSettings = {
     /* x_max: max. x */
     x_max: 1,
 
+    /* m */
+    m: Math.pow(window.constants.h_reduced, 2) / 2,
+
+    /* L: width of potential well */
+    L: 1,
+
+    /* potential function */
+    V: function (x) {
+        return 0 * x;
+    },
+
     /* E = (n²⋅π²⋅ℏ²)/(2⋅m⋅L) | m = ℏ²/2 ∧ L = 1 ∧ n = 3 */
-    energyStart:  window.numericalAnalysis.calculateEnergy(3),
+    energyStart: 0,
 
     /* energy scale */
     energyScale: 8,
@@ -34,6 +49,10 @@ window.initialSettings = {
     /* energy level */
     energyLevel: 3
 };
+
+/* recalculate some initial settings */
+window.initialSettings.constants   = window.constants;
+window.initialSettings.energyStart = window.numericalAnalysis.calculateEnergy(3, initialSettings);
 
 /* plotly id */
 window.idDivPlotly = 'graph-quantum-mechanics';
@@ -180,10 +199,10 @@ window.calculate = function(initialSettings, tPrecision) {
         var traceKey = Object.keys(traces)[n + 1];
         var trace    = traces[traceKey];
 
-        window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n) / window.initialSettings.energyScale);
+        window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n, initialSettings) / window.initialSettings.energyScale);
     }
-    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric'], window.numericalAnalysis.calculateEnergy(3) / window.initialSettings.energyScale);
-    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric-normalized'], window.numericalAnalysis.calculateEnergy(3) / window.initialSettings.energyScale);
+    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric'], window.numericalAnalysis.calculateEnergy(3, initialSettings) / window.initialSettings.energyScale);
+    window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric-normalized'], window.numericalAnalysis.calculateEnergy(3, initialSettings) / window.initialSettings.energyScale);
 
     /* refresh the output (delete and redraw) */
     for (var key in traces) {
