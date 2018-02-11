@@ -48,7 +48,7 @@ window.initialSettings = {
     energyScale: 1,
 
     /* energy level */
-    energyLevel: 1,
+    energyLevel: 0,
 
     /* V(x): potential function */
     V: function (x) {
@@ -75,18 +75,17 @@ window.initialSettings = {
 
     /* the analytic energy eigenvalue function */
     analyticEnergyFunction: function (n) {
-        return (Math.pow(n, 2) * Math.pow(Math.PI, 2) * Math.pow(window.initialSettings.constants.h_reduced, 2)) /
-            (2 * window.initialSettings.m * Math.pow(window.initialSettings.L, 2));
+        return window.initialSettings.constants.h_reduced * window.initialSettings.omega * (n + 1 / 2);
     }
 };
 
 /* recalculate some initial settings */
 window.initialSettings.constants   = window.constants;
-window.initialSettings.energyStart = window.numericalAnalysis.calculateEnergy(window.initialSettings.energyLevel, window.initialSettings);
 window.initialSettings.omega       = Math.sqrt(window.initialSettings.k / window.initialSettings.m);
+window.initialSettings.energyStart = window.numericalAnalysis.calculateEnergy(window.initialSettings.energyLevel, window.initialSettings);
 
 /* plotly id */
-window.idDivPlotly = 'graph-quantum-mechanics';
+window.idDivPlotly = 'graph-quantum-mechanics-harmonic';
 
 /**
  * Main start function.
@@ -106,7 +105,7 @@ window.main = function() {
         },
         yaxis: {
             title: 'V(x) / ' + window.initialSettings.energyScale,
-            range: [-0.5, 1 / window.initialSettings.energyScale]
+            range: [-0.5, 4 / window.initialSettings.energyScale]
         }
     };
 
@@ -172,6 +171,18 @@ window.calculate = function(initialSettings, tPrecision) {
     var traces = {};
 
     /* prepare the needed traces */
+    traces['trace-e1-analytic'] = window.helper.getDefaultTraceConfig({
+        id: 'trace-e1-analytic',
+        name: 'E₁ (analytic)'
+    });
+    traces['trace-e2-analytic'] = window.helper.getDefaultTraceConfig({
+        id: 'trace-e2-analytic',
+        name: 'E₂ (analytic)'
+    });
+    traces['trace-e3-analytic'] = window.helper.getDefaultTraceConfig({
+        id: 'trace-e3-analytic',
+        name: 'E₃ (analytic)'
+    });
     // traces['trace-e1-numeric'] = window.helper.getDefaultTraceConfig({
     //     id: 'trace-e1-numeric',
     //     name: String('E%s (numeric)').replace(/%s/g, window.initialSettings.energyLevel)
@@ -180,26 +191,6 @@ window.calculate = function(initialSettings, tPrecision) {
     //     id: 'trace-e1-numeric-normalized',
     //     name: String('E%s Normalized (numeric)').replace(/%s/g, window.initialSettings.energyLevel)
     // }, 1);
-    traces['trace-e1-analytic'] = window.helper.getDefaultTraceConfig({
-        id: 'trace-e1-analytic',
-        name: 'E1 (analytic)'
-    });
-    traces['trace-e2-analytic'] = window.helper.getDefaultTraceConfig({
-        id: 'trace-e2-analytic',
-        name: 'E2 (analytic)'
-    });
-    traces['trace-e3-analytic'] = window.helper.getDefaultTraceConfig({
-        id: 'trace-e3-analytic',
-        name: 'E3 (analytic)'
-    });
-    // traces['trace-e4-analytic'] = window.helper.getDefaultTraceConfig({
-    //     id: 'trace-e4-analytic',
-    //     name: 'E4 (analytic)'
-    // });
-    // traces['trace-e5-analytic'] = window.helper.getDefaultTraceConfig({
-    //     id: 'trace-e5-analytic',
-    //     name: 'E5 (analytic)'
-    // });
 
     // /* Calculates the schrödinger equation with numerov algorithm */
     // var traceNumericRaw = traces['trace-e1-numeric'];
@@ -228,12 +219,12 @@ window.calculate = function(initialSettings, tPrecision) {
     }
 
     /* set energy */
-    // for (var n = 0; n <= 0; n++) {
-    //     var traceKey = Object.keys(traces)[n];
-    //     var trace    = traces[traceKey];
-    //
-    //     window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n, initialSettings) / initialSettings.energyScale);
-    // }
+    for (var n = 0; n <= 2; n++) {
+        var traceKey = Object.keys(traces)[n];
+        var trace    = traces[traceKey];
+
+        window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n, initialSettings) / initialSettings.energyScale);
+    }
     // window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric'], window.numericalAnalysis.calculateEnergy(initialSettings.energyLevel, initialSettings) / initialSettings.energyScale);
     // window.numericalAnalysis.moveTraceY(traces['trace-e1-numeric-normalized'], window.numericalAnalysis.calculateEnergy(initialSettings.energyLevel, initialSettings) / initialSettings.energyScale);
 

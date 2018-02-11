@@ -120,6 +120,6 @@
                 </form>
             </p>
         </div>
-        <div id="graph-quantum-mechanics" class="graph"></div>
+        <div id="graph-quantum-mechanics-harmonic" class="graph"></div>
     </body>
 </html>
