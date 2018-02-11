@@ -244,16 +244,17 @@ window.calculate = function(initialSettings, tPrecision) {
         id: 'trace-e3-analytic',
         name: 'E3 (analytic)'
     }));
-    
-    var x      = 0;
 
-    traces[0].x.push(x);
+    /* set x to 0 */
+    initialSettings.x = 0;
+
+    traces[0].x.push(initialSettings.x);
     traces[0].y.push(initialSettings.y_i_1);
-    x += initialSettings.d_x;
+    initialSettings.x += initialSettings.d_x;
 
-    traces[0].x.push(x);
+    traces[0].x.push(initialSettings.x);
     traces[0].y.push(initialSettings.y_i);
-    x += initialSettings.d_x;
+    initialSettings.x += initialSettings.d_x;
 
     var zeroCounter = 0;
     var currentAlgebraicSign = true;
@@ -261,9 +262,9 @@ window.calculate = function(initialSettings, tPrecision) {
     do {
         var y_i1 = window.numerow(initialSettings.d_x, initialSettings.y_i_1, initialSettings.y_i, initialSettings.energy);
 
-        traces[0].x.push(x);
+        traces[0].x.push(initialSettings.x);
         traces[0].y.push(y_i1);
-        x += initialSettings.d_x;
+        initialSettings.x += initialSettings.d_x;
 
         initialSettings.y_i_1 = initialSettings.y_i;
         initialSettings.y_i   = y_i1;
@@ -285,9 +286,6 @@ window.calculate = function(initialSettings, tPrecision) {
     traces[1].y = traces[0].y.slice();
 
     window.normalizeTrace(traces[1]);
-
-
-    initialSettings.d_x = 0.01;
 
     for (var n = 1; n <= 3; n++) {
         var current_x = 0;
