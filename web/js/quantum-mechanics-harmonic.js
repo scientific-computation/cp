@@ -176,43 +176,75 @@ window.calculate = function(initialSettings, tPrecision) {
     /* initialize the trace container */
     var traces = {};
 
+    traces['potential'] = window.helper.getDefaultTraceConfig({
+        id: 'potential',
+        name: 'Potential V(x) = k/2⋅x²'
+    }, 2);
+
     /* prepare the needed traces */
     for (var n = 0; n <= 2; n++) {
         traces['trace-e' + n + '-analytic'] = window.helper.getDefaultTraceConfig({
             id: 'trace-e' + n + '-analytic',
-            name: 'E' + window.numericalAnalysis.getUnderscoreNumber(n) + ' (analytic)'
+            name: 'E' + window.helper.getUnderscoreNumber(n) + ' (analytic)'
         }, 2);
     }
-    for (var i = 0; i <= 2; i++) {
-        traces['trace-e' + i + '-numeric'] = window.helper.getDefaultTraceConfig({
-            id: 'trace-e' + i + '-numeric',
-            name: String('E' + window.numericalAnalysis.getUnderscoreNumber(n) + ' (numeric)')
+    for (var n = 0; n <= 2; n++) {
+        traces['trace-e' + n + '-numeric'] = window.helper.getDefaultTraceConfig({
+            id: 'trace-e' + n + '-numeric',
+            name: String('E' + window.helper.getUnderscoreNumber(n) + ' (numeric)')
         });
-        traces['trace-e' + i + '-numeric-normalized'] = window.helper.getDefaultTraceConfig({
-            id: 'trace-e' + i + '-numeric-normalized',
-            name: String('E' + window.numericalAnalysis.getUnderscoreNumber(n) + ' Normalized (numeric)')
+        traces['trace-e' + n + '-numeric-normalized'] = window.helper.getDefaultTraceConfig({
+            id: 'trace-e' + n+ '-numeric-normalized',
+            name: String('E' + window.helper.getUnderscoreNumber(n) + ' Normalized (numeric)')
         });
     }
 
     // y0 -8 7.107932950961829e-8
 
-    /* Calculates the schrödinger equation with numerov algorithm and normalize it */
-    for (var i = 0; i <= 2; i++) {
-        var traceNumericRaw = traces['trace-e' + i + '-numeric'];
-        traceNumericRaw.energyLevel = i;
+    /* Calculates the first three schrödinger equations with numerov algorithm and normalize it */
+    for (var n = 0; n <= 2; n++) {
+        var traceNumericRaw = traces['trace-e' + n + '-numeric'];
+
+        /* solve the schrödinger equation */
+        traceNumericRaw.energyLevel = n;
         window.initialSettings.y_i = window.numericalAnalysis.guessNextY(traceNumericRaw);
         window.initialSettings.energyLevel = traceNumericRaw.energyLevel;
         window.initialSettings.energyStart = window.numericalAnalysis.calculateEnergy(window.initialSettings.energyLevel, window.initialSettings);
         window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
 
-        traces['trace-e' + i + '-numeric-normalized'].x = traceNumericRaw.x.slice();
-        traces['trace-e' + i + '-numeric-normalized'].y = traceNumericRaw.y.slice();
-        window.numericalAnalysis.normalizeTrace(traces['trace-e' + i + '-numeric-normalized']);
+        /* normalize it */
+        traces['trace-e' + n + '-numeric-normalized'].x = traceNumericRaw.x.slice();
+        traces['trace-e' + n + '-numeric-normalized'].y = traceNumericRaw.y.slice();
+        window.numericalAnalysis.normalizeTrace(traces['trace-e' + n + '-numeric-normalized']);
+
+        /* set energy level: correct y value according the energy level (analytic and numeric solutions) */
+        window.numericalAnalysis.moveTraceY(
+            traces['trace-e' + n + '-numeric'],
+            window.numericalAnalysis.calculateEnergy(traces['trace-e' + n + '-numeric'].energyLevel, initialSettings) / initialSettings.energyScale
+        );
+        window.numericalAnalysis.moveTraceY(
+            traces['trace-e' + n + '-numeric-normalized'],
+            window.numericalAnalysis.calculateEnergy(traces['trace-e' + n + '-numeric'].energyLevel, initialSettings) / initialSettings.energyScale
+        );
     }
 
-    /* create some analytic wave function φ_n(x) = √(2/L)⋅sin(n⋅π⋅x/L) | n = 1 .. 5 */
+    /* add the potential plot */
+    var traceKey = Object.keys(traces)[0];
+    var trace    = traces[traceKey];
+    var current_x = window.initialSettings.x;
+    var max_x     = window.initialSettings.x_max;
+    do {
+        var current_y = window.initialSettings.V(current_x);
+
+        trace.x.push(current_x);
+        trace.y.push(current_y);
+
+        current_x += initialSettings.d_x;
+    } while (current_x < max_x);
+
+    /* create the first three analytic wave functions */
     for (var n = 0; n <= 2; n++) {
-        var traceKey = Object.keys(traces)[n];
+        var traceKey = Object.keys(traces)[n + 1];
         var trace    = traces[traceKey];
 
         var current_x = window.initialSettings.x;
@@ -225,24 +257,9 @@ window.calculate = function(initialSettings, tPrecision) {
 
             current_x += initialSettings.d_x;
         } while (current_x < max_x);
-    }
 
-    /* set energy level: correct y value (analytic and numeric solutions) */
-    for (var n = 0; n <= 2; n++) {
-        var traceKey = Object.keys(traces)[n];
-        var trace    = traces[traceKey];
-
+        /* set energy level: correct y value according the energy level (analytic and numeric solutions) */
         window.numericalAnalysis.moveTraceY(trace, window.numericalAnalysis.calculateEnergy(n, initialSettings) / initialSettings.energyScale);
-    }
-    for (var i = 0; i <= 2; i++) {
-        window.numericalAnalysis.moveTraceY(
-            traces['trace-e' + i + '-numeric'],
-            window.numericalAnalysis.calculateEnergy(traces['trace-e' + i + '-numeric'].energyLevel, initialSettings) / initialSettings.energyScale
-        );
-        window.numericalAnalysis.moveTraceY(
-            traces['trace-e' + i + '-numeric-normalized'],
-            window.numericalAnalysis.calculateEnergy(traces['trace-e' + i + '-numeric'].energyLevel, initialSettings) / initialSettings.energyScale
-        );
     }
 
     /* refresh the output (delete and redraw) */

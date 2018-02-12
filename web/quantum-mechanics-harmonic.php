@@ -19,7 +19,7 @@
     <body>
         <div class="content">
             <h1>Quantum mechanics - quantum harmonic oscillator</h1>
-            <h2>equations:</h2>
+            <!--h2>equations:</h2-->
             <!--p>
                 <table border="0" cellpadding="0" cellspacing="0" class="equations">
                     <tr>

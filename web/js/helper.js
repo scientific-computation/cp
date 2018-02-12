@@ -63,5 +63,31 @@ window.helper = {
         }
 
         return Plotly.deleteTraces(idPlotly, deleteId);
+    },
+
+    /**
+     * Returns the underscore number from given number.
+     *
+     * @param number
+     * @returns {string}
+     */
+    getUnderscoreNumber: function (number) {
+        switch (number) {
+            case 0:
+                return '₀';
+                break;
+
+            case 1:
+                return '₁';
+                break;
+
+            case 2:
+                return '₂';
+                break;
+
+            default:
+                return '₀';
+                break;
+        }
     }
 };
