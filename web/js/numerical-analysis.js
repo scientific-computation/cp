@@ -5,18 +5,18 @@ window.numericalAnalysis = {
      * Calculates the next psi step with numerov method.
      *
      */
-    numerov: function(coordinates, initialSettings) {
+    numerov: function (coordinates, initialSettings) {
         /* use the following energy value to calculate the wave function */
         var E = initialSettings.energyStart;
 
         /* calculate Q₋₁, Q₀ and Q₊₁ */
         var q_i_1 = this.calculateQ(E, coordinates.x_i_1, initialSettings);
-        var q_i   = this.calculateQ(E, coordinates.x_i, initialSettings);
-        var q_i1  = this.calculateQ(E, coordinates.x_i1, initialSettings);
+        var q_i = this.calculateQ(E, coordinates.x_i, initialSettings);
+        var q_i1 = this.calculateQ(E, coordinates.x_i1, initialSettings);
 
         var d_x_square = Math.pow(initialSettings.d_x, 2);
 
-        var value1 = (2 - 5/6 * q_i * d_x_square) * coordinates.y_i;
+        var value1 = (2 - 5 / 6 * q_i * d_x_square) * coordinates.y_i;
         var value2 = (1 + q_i_1 * d_x_square / 12) * coordinates.y_i_1;
         var value3 = 1 + q_i1 * d_x_square / 12;
 
@@ -65,11 +65,11 @@ window.numericalAnalysis = {
 
             /* set new y₋₁ and y₀ */
             coordinates.y_i_1 = coordinates.y_i;
-            coordinates.y_i   = y_i1;
+            coordinates.y_i = y_i1;
 
             /* set new x₋₁, x₀ and x₊₁ */
             coordinates.x_i_1 = coordinates.x_i;
-            coordinates.x_i   = coordinates.x_i1;
+            coordinates.x_i = coordinates.x_i1;
             coordinates.x_i1 += initialSettings.d_x;
         } while (zeroCounter < initialSettings.energyLevel);
 
@@ -196,5 +196,40 @@ window.numericalAnalysis = {
         algebraicSign2 = algebraicSign2 === 0 ? 1 : algebraicSign2;
 
         return algebraicSign1 !== algebraicSign2;
+    },
+
+    /**
+     * Guess the next y value from given energy level.
+     *
+     * @param trace
+     */
+    guessNextY: function (trace) {
+        return Math.pow(-1, trace.energyLevel) * Math.pow(10, -8 + trace.energyLevel / 1.3);
+    },
+
+    /**
+     * Returns the underscore number from given number.
+     *
+     * @param number
+     * @returns {string}
+     */
+    getUnderscoreNumber: function (number) {
+        switch (number) {
+            case 0:
+                return '₀';
+                break;
+
+            case 1:
+                return '₁';
+                break;
+
+            case 2:
+                return '₂';
+                break;
+
+            default:
+                return '₀';
+                break;
+        }
     }
 };
