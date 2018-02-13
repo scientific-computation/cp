@@ -217,7 +217,7 @@ window.calculate = function(initialSettings, tPrecision) {
         traceNumericRaw.energyLevel = initialSettings.energyLevel;
         if (n === 0) {
             var result = {
-                'E_guess': .2,
+                'E_guess': .45,
                 'percent': 100
             };
         } else {

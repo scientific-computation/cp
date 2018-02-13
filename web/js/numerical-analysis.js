@@ -82,7 +82,7 @@ window.numericalAnalysis = {
             }
 
             /* checks if the current point is a stationary point */
-            if (window.numericalAnalysis.isStationaryPoint(trace, p_i.y, p_i1.y)) {
+            if (window.numericalAnalysis.isStationaryPoint(p_i_1, p_i, p_i1, trace)) {
                 stationaryCounter++;
                 console.log('stationary point found (' + (trace.slope === 'up' ? 'min' : 'max') + ').', stationaryCounter, p_i.x + '/' + p_i.y);
             }
@@ -263,23 +263,19 @@ window.numericalAnalysis = {
      * @param y1
      * @param y2
      */
-    isStationaryPoint: function (trace, y1, y2) {
-        if (trace.slope === 'up') {
-            if (y1 > y2) {
-                trace.slope = 'down';
-                return true;
-            } else {
-                return false;
-            }
+    isStationaryPoint: function (p_i_1, p_i, p_i1, trace) {
+
+        var slope1 = p_i.y - p_i_1.y;
+        var slope2 = p_i1.y - p_i.y;
+
+        if (slope1 >= 0 && slope2 < 0) {
+            trace.slope = 'down';
+            return true;
         }
 
-        if (trace.slope === 'down') {
-            if (y1 < y2) {
-                trace.slope = 'up';
-                return true;
-            } else {
-                return false;
-            }
+        if (slope1 <= 0 && slope2 > 0) {
+            trace.slope = 'up';
+            return true;
         }
 
         return false;
@@ -292,7 +288,7 @@ window.numericalAnalysis = {
      * @param p_i
      * @param p_i1
      */
-    isInflectionPoint: function (p_i_1, p_i, p_i1) {
+    isInflectionPoint: function (p_i_1, p_i, p_i1, trace) {
 
 
         return false;
