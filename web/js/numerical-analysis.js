@@ -73,7 +73,16 @@ window.numericalAnalysis = {
             coordinates.x_i1 += initialSettings.d_x;
         } while (zeroCounter < initialSettings.energyLevel);
 
-        return trace;
+        var E_guess = window.initialSettings.energyStart / (8 * 2 / (coordinates.x_i + 8));
+        var percent = 100 * Math.abs(1 - (coordinates.x_i + 8) / (8 * 2));
+
+        return {
+            'E':                window.initialSettings.energyStart,
+            'E_guess':          (E_guess - window.initialSettings.energyStart) * Math.pow(percent / 100, 4) + window.initialSettings.energyStart,
+            'x_expected':       8,
+            'x_pivot':          coordinates.x_i,
+            'percent':          percent
+        };
     },
 
     /**
@@ -201,9 +210,20 @@ window.numericalAnalysis = {
     /**
      * Guess the next y value from given energy level.
      *
-     * @param trace
+     * @param initialSettings
      */
-    guessNextY: function (trace) {
-        return Math.pow(-1, trace.energyLevel) * Math.pow(10, -8 + trace.energyLevel / 1.3);
+    guessNextY: function (x, y, initialSettings) {
+        var q = Math.sqrt(
+            2 * initialSettings.m / Math.pow(initialSettings.constants.h_reduced, 2)
+        ) * Math.sqrt(
+            initialSettings.V(x) - initialSettings.energyStart
+        );
+
+        var y_next = Math.exp(q * initialSettings.d_x) * y;
+
+        /* add some extra y distance according to the energy level */
+        y_next += y_next * Math.pow(initialSettings.energyLevel, 2) / 2;
+
+        return y_next;
     }
 };
