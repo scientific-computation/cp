@@ -26,11 +26,17 @@ window.initialSettings = {
     /* y: start point y */
     y: 7 * Math.pow(10, -8),
 
+    /* y_max: maximal y */
+    y_max: 10000,
+
     /* x: start point x */
     x: -8,
 
-    /* x_max: max. x */
+    /* x_max: maximal x */
     x_max: 8,
+
+    /* inflection_max: the maximal number of inflections within two zero points */
+    inflection_max: 2,
 
     /* m */
     m: Math.pow(window.constants.h_reduced, 2) / 2,
@@ -205,50 +211,42 @@ window.calculate = function(initialSettings, tPrecision) {
 
     /* Calculates the first three schrödinger equations with numerov algorithm and normalize it */
     for (var n = 0; n <= 2; n++) {
+        console.log('start energy level ' + n);
+
         var traceNumericRaw = traces['trace-e' + n + '-numeric'];
 
         /* solve the schrödinger equation */
+        traceNumericRaw.up          = n % 2 === 0 ? true : false;
+        traceNumericRaw.slope       = traceNumericRaw.up ? 'up' : 'down';
         initialSettings.energyLevel = n;
+        traceNumericRaw.energyLevel = initialSettings.energyLevel;
         if (n === 0) {
-            initialSettings.energyStart = .45;
+            var result = {
+                'E_guess': .49,
+                'percent': 100
+            };
         } else {
-            initialSettings.energyStart = window.numericalAnalysis.calculateEnergy(n, initialSettings);
+            var result = {
+                'E_guess': window.numericalAnalysis.calculateEnergy(n, initialSettings),
+                'percent': 100
+            };
         }
 
-        traceNumericRaw.energyLevel = initialSettings.energyLevel;
-        traceNumericRaw.energyStart = initialSettings.energyStart;
+        /* calculate the energy level */
+        for (var i = 0; i < 1; i++) {
+            if (result.percent > 0.5) {
+                initialSettings.energyStart = result['E_guess'];
+                traceNumericRaw.energyStart = initialSettings.energyStart;
 
-        initialSettings.y_i_1 = initialSettings.y * Math.pow(-1, n);
-        initialSettings.y_i = window.numericalAnalysis.guessNextY(initialSettings.x, initialSettings.y_i_1, initialSettings);
+                initialSettings.y_i_1 = initialSettings.y * Math.pow(-1, n);
+                initialSettings.y_i = window.numericalAnalysis.guessNextY(initialSettings.x, initialSettings.y_i_1, initialSettings);
 
+                traceNumericRaw.x = [];
+                traceNumericRaw.y = [];
 
-
-        // if (n === 4) {
-        //
-        //     var result = {
-        //         'E_guess': 1,
-        //         'percent': 100
-        //     };
-        //
-        //     for (var i = 0; i <= 100; i++) {
-        //         if (result.percent > 1) {
-        //             traceNumericRaw.x = [];
-        //             traceNumericRaw.y = [];
-        //
-        //             initialSettings.energyStart = result['E_guess'];
-        //             var result = window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
-        //         } else {
-        //             break;
-        //         }
-        //
-        //         console.log('result', result);
-        //     }
-        // } else if (n === 5) {
-        //     initialSettings.energyStart = .25;
-        //     var result = window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
-        // } else {
-            var result = window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
-        //}
+                var result = window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
+            }
+        }
 
         /* normalize it */
         traces['trace-e' + n + '-numeric-normalized'].x = traceNumericRaw.x.slice();

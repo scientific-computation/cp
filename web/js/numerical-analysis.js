@@ -50,13 +50,43 @@ window.numericalAnalysis = {
 
         /* calculate the y₊₁ points */
         var zeroCounter = -1;
+        var inflectionCounter = 0;
+        var energyLowerThanAllowed = false;
         do {
             /* calculate y₊₁ */
             var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
 
-            /* Checks if the new value differ in sign and count this issue. */
+            /* checks if the new value differ in sign and count this issue. */
             if (window.numericalAnalysis.algebraicSignHasChanged(coordinates.y_i, y_i1)) {
                 zeroCounter++;
+                inflectionCounter = 0;
+                console.log('zero point found.', coordinates.x_i_1 + '/' + coordinates.y_i_1, coordinates.x_i + '/' + coordinates.y_i, coordinates.x_i1 + '/' + y_i1);
+            }
+
+            /* checks if the current point is a stationary point */
+            if (window.numericalAnalysis.isStationaryPoint(trace, coordinates.y_i, y_i1)) {
+                inflectionCounter++;
+                console.log('stationary point found (' + (trace.slope === 'up' ? 'min' : 'max') + ').', inflectionCounter, coordinates.x_i + '/' + coordinates.y_i);
+            }
+
+            /* max zero points reached */
+            if (zeroCounter >= initialSettings.energyLevel) {
+                break;
+            }
+
+            /* maximal number of inflection points between two zero points reached */
+            if (inflectionCounter >= 2) {
+                break;
+            }
+
+            /* y to high -> the energy is maybe less than physically allowed */
+            if (y_i1 > initialSettings.y_max) {
+                break;
+            }
+
+            /* only calculate the wave function between the given bounds */
+            if (coordinates.x_i1 > initialSettings.x_max) {
+                break;
             }
 
             /* save calculated value to current trace */
@@ -71,17 +101,18 @@ window.numericalAnalysis = {
             coordinates.x_i_1 = coordinates.x_i;
             coordinates.x_i = coordinates.x_i1;
             coordinates.x_i1 += initialSettings.d_x;
-        } while (zeroCounter < initialSettings.energyLevel);
+        } while (true);
 
         var E_guess = window.initialSettings.energyStart / (8 * 2 / (coordinates.x_i + 8));
         var percent = 100 * Math.abs(1 - (coordinates.x_i + 8) / (8 * 2));
 
         return {
-            'E':                window.initialSettings.energyStart,
-            'E_guess':          (E_guess - window.initialSettings.energyStart) * Math.pow(percent / 100, 4) + window.initialSettings.energyStart,
-            'x_expected':       8,
-            'x_pivot':          coordinates.x_i,
-            'percent':          percent
+            'E':                      window.initialSettings.energyStart,
+            'E_guess':                E_guess,//(E_guess - window.initialSettings.energyStart) * percent / 100 + window.initialSettings.energyStart,
+            'x_expected':             8,
+            'x_pivot':                coordinates.x_i,
+            'percent':                percent,
+            'energyLowerThanAllowed': energyLowerThanAllowed
         };
     },
 
@@ -164,9 +195,6 @@ window.numericalAnalysis = {
             area += this.calculateArea(d_x, Math.pow(trace.y[i - 1], 2), Math.pow(trace.y[i], 2));
         }
 
-        console.log('A² = ' + area);
-        console.log('A = ' + Math.sqrt(area));
-
         for (var i = 0; i < trace.y.length; i++) {
             trace.y[i] /= Math.sqrt(area);
         }
@@ -197,14 +225,43 @@ window.numericalAnalysis = {
      * @param x1
      * @param x2
      */
-    algebraicSignHasChanged: function (x1, x2) {
-        var algebraicSign1 = Math.sign(x1);
-        var algebraicSign2 = Math.sign(x2);
+    algebraicSignHasChanged: function (y1, y2) {
+        var algebraicSign1 = Math.sign(y1);
+        var algebraicSign2 = Math.sign(y2);
 
         algebraicSign1 = algebraicSign1 === 0 ? 1 : algebraicSign1;
         algebraicSign2 = algebraicSign2 === 0 ? 1 : algebraicSign2;
 
         return algebraicSign1 !== algebraicSign2;
+    },
+
+    /**
+     * Detects a stationary point.
+     *
+     * @param trace
+     * @param y1
+     * @param y2
+     */
+    isStationaryPoint: function (trace, y1, y2) {
+        if (trace.slope === 'up') {
+            if (y1 > y2) {
+                trace.slope = 'down';
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        if (trace.slope === 'down') {
+            if (y1 < y2) {
+                trace.slope = 'up';
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return false;
     },
 
     /**
