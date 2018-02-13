@@ -5,19 +5,19 @@ window.numericalAnalysis = {
      * Calculates the next psi step with numerov method.
      *
      */
-    numerov: function (coordinates, initialSettings) {
+    numerov: function (p_i_1, p_i, p_i1, initialSettings) {
         /* use the following energy value to calculate the wave function */
         var E = initialSettings.energyStart;
 
         /* calculate Q₋₁, Q₀ and Q₊₁ */
-        var q_i_1 = this.calculateQ(E, coordinates.x_i_1, initialSettings);
-        var q_i = this.calculateQ(E, coordinates.x_i, initialSettings);
-        var q_i1 = this.calculateQ(E, coordinates.x_i1, initialSettings);
+        var q_i_1 = this.calculateQ(E, p_i_1.x, initialSettings);
+        var q_i = this.calculateQ(E, p_i.x, initialSettings);
+        var q_i1 = this.calculateQ(E, p_i1.x, initialSettings);
 
         var d_x_square = Math.pow(initialSettings.d_x, 2);
 
-        var value1 = (2 - 5 / 6 * q_i * d_x_square) * coordinates.y_i;
-        var value2 = (1 + q_i_1 * d_x_square / 12) * coordinates.y_i_1;
+        var value1 = (2 - 5 / 6 * q_i * d_x_square) * p_i.y;
+        var value2 = (1 + q_i_1 * d_x_square / 12) * p_i_1.y;
         var value3 = 1 + q_i1 * d_x_square / 12;
 
         return (value1 - value2) / value3;
@@ -31,22 +31,27 @@ window.numericalAnalysis = {
      */
     numerovHelper: function (trace, initialSettings) {
 
-        /* create coordinates object */
-        var coordinates = {
-            x_i_1: initialSettings.x,
-            x_i: initialSettings.x + initialSettings.d_x,
-            x_i1: initialSettings.x + 2 * initialSettings.d_x,
-            y_i_1: initialSettings.y_i_1,
-            y_i: initialSettings.y_i
+        /* build point objects */
+        var p_i_1 = {
+            x: initialSettings.x,
+            y: initialSettings.y_i_1
+        };
+        var p_i = {
+            x: initialSettings.x + initialSettings.d_x,
+            y: initialSettings.y_i
+        };
+        var p_i1 = {
+            x: initialSettings.x + 2 * initialSettings.d_x,
+            y: 0
         };
 
         /* calculate the y₋₁ point */
-        trace.x.push(coordinates.x_i_1);
-        trace.y.push(coordinates.y_i_1);
+        trace.x.push(p_i_1.x);
+        trace.y.push(p_i_1.y);
 
         /* calculate the y₀ point */
-        trace.x.push(coordinates.x_i);
-        trace.y.push(coordinates.y_i);
+        trace.x.push(p_i.x);
+        trace.y.push(p_i.y);
 
         /* calculate the y₊₁ points */
         var zeroCounter = -1;
@@ -54,22 +59,20 @@ window.numericalAnalysis = {
         var inflectionCounter = 0;
         do {
             /* calculate y₊₁ */
-            var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
-
-
+            p_i1.y = window.numericalAnalysis.numerov(p_i_1, p_i, p_i1, initialSettings);
 
             /* checks if the current point is a zero point (differs in sign) */
-            if (window.numericalAnalysis.algebraicSignHasChanged(coordinates.y_i, y_i1)) {
+            if (window.numericalAnalysis.algebraicSignHasChanged(p_i.y, p_i1.y)) {
                 zeroCounter++;
                 stationaryCounter = 0;
                 inflectionCounter = 0;
-                console.log('zero point found.', coordinates.x_i_1 + '/' + coordinates.y_i_1, coordinates.x_i + '/' + coordinates.y_i, coordinates.x_i1 + '/' + y_i1);
+                console.log('zero point found.', p_i_1.x + '/' + p_i_1.y, p_i.x + '/' + p_i.y, p_i1.x + '/' + p_i1.y);
             }
 
             /* checks if the current point is a stationary point */
-            if (window.numericalAnalysis.isStationaryPoint(trace, coordinates.y_i, y_i1)) {
+            if (window.numericalAnalysis.isStationaryPoint(trace, p_i.y, p_i1.y)) {
                 stationaryCounter++;
-                console.log('stationary point found (' + (trace.slope === 'up' ? 'min' : 'max') + ').', stationaryCounter, coordinates.x_i + '/' + coordinates.y_i);
+                console.log('stationary point found (' + (trace.slope === 'up' ? 'min' : 'max') + ').', stationaryCounter, p_i.x + '/' + p_i.y);
             }
 
             /* checks if the current point is an inflection point */
@@ -97,39 +100,44 @@ window.numericalAnalysis = {
             }
 
             /* y to high -> the energy is maybe less than physically allowed */
-            if (y_i1 > initialSettings.y_max) {
+            if (p_i1.y > initialSettings.y_max) {
                 console.warn('Y to high!');
                 break;
             }
 
             /* only calculate the wave function between the given bounds */
-            if (coordinates.x_i1 > 2 * initialSettings.x_max) {
+            if (p_i1.x > 2 * initialSettings.x_max) {
                 console.warn('X to high!');
                 break;
             }
 
             /* save calculated value to current trace */
-            trace.x.push(coordinates.x_i1);
-            trace.y.push(y_i1);
+            trace.x.push(p_i1.x);
+            trace.y.push(p_i1.y);
 
-            /* set new y₋₁ and y₀ */
-            coordinates.y_i_1 = coordinates.y_i;
-            coordinates.y_i = y_i1;
-
-            /* set new x₋₁, x₀ and x₊₁ */
-            coordinates.x_i_1 = coordinates.x_i;
-            coordinates.x_i = coordinates.x_i1;
-            coordinates.x_i1 += initialSettings.d_x;
+            /* set new p₋₁, p₀ and p₊₁ */
+            p_i_1 = {
+                x: p_i.x,
+                y: p_i.y
+            };
+            p_i = {
+                x: p_i1.x,
+                y: p_i1.y
+            };
+            p_i1 = {
+                x: p_i.x + initialSettings.d_x,
+                y: 0
+            };
         } while (true);
 
-        var E_guess = window.initialSettings.energyStart / (8 * 2 / (coordinates.x_i + 8));
-        var percent = 100 * Math.abs(1 - (coordinates.x_i + 8) / (8 * 2));
+        var E_guess = window.initialSettings.energyStart / (8 * 2 / (p_i.x + 8));
+        var percent = 100 * Math.abs(1 - (p_i.x + 8) / (8 * 2));
 
         return {
             'E':          window.initialSettings.energyStart,
             'E_guess':    E_guess,//(E_guess - window.initialSettings.energyStart) * percent / 100 + window.initialSettings.energyStart,
             'x_expected': 8,
-            'x_pivot':    coordinates.x_i,
+            'x_pivot':    p_i.x,
             'percent':    percent
         };
     },
