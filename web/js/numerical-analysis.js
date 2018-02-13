@@ -56,7 +56,7 @@ window.numericalAnalysis = {
             /* calculate y₊₁ */
             var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
 
-            /* checks if the new value differ in sign and count this issue. */
+            /* checks if the current point is a zero point (differs in sign) */
             if (window.numericalAnalysis.algebraicSignHasChanged(coordinates.y_i, y_i1)) {
                 zeroCounter++;
                 inflectionCounter = 0;
@@ -75,7 +75,7 @@ window.numericalAnalysis = {
             }
 
             /* maximal number of inflection points between two zero points reached */
-            if (inflectionCounter >= 2) {
+            if (inflectionCounter >= initialSettings.inflection_max) {
                 break;
             }
 
