@@ -84,13 +84,14 @@ window.numericalAnalysis = {
             /* checks if the current point is a stationary point */
             if (window.numericalAnalysis.isStationaryPoint(p_i_1, p_i, p_i1, trace)) {
                 stationaryCounter++;
+                inflectionCounter = 0;
                 console.log('stationary point found (' + (trace.slope === 'up' ? 'min' : 'max') + ').', stationaryCounter, p_i.x + '/' + p_i.y);
             }
 
             /* checks if the current point is an inflection point */
-            if (window.numericalAnalysis.isInflectionPoint()) {
+            if (window.numericalAnalysis.isInflectionPoint(p_i_1, p_i, p_i1, trace)) {
                 inflectionCounter++;
-                console.log('inflection point found.');
+                console.log('inflection point found.', inflectionCounter, p_i.x + '/' + p_i.y);
             }
 
             /* max zero points reached */
@@ -265,15 +266,15 @@ window.numericalAnalysis = {
      */
     isStationaryPoint: function (p_i_1, p_i, p_i1, trace) {
 
-        var slope1 = p_i.y - p_i_1.y;
-        var slope2 = p_i1.y - p_i.y;
+        var ySlope1 = p_i.y - p_i_1.y;
+        var ySlope2 = p_i1.y - p_i.y;
 
-        if (slope1 >= 0 && slope2 < 0) {
+        if (ySlope1 >= 0 && ySlope2 < 0) {
             trace.slope = 'down';
             return true;
         }
 
-        if (slope1 <= 0 && slope2 > 0) {
+        if (ySlope1 <= 0 && ySlope2 > 0) {
             trace.slope = 'up';
             return true;
         }
@@ -289,8 +290,25 @@ window.numericalAnalysis = {
      * @param p_i1
      */
     isInflectionPoint: function (p_i_1, p_i, p_i1, trace) {
+        var slope1 = (p_i.y - p_i_1.y) / (p_i.x - p_i_1.x);
+        var slope2 = (p_i1.y - p_i.y) / (p_i1.x - p_i.x);
 
+        if (trace.lastChangeSlope === 0) {
+            trace.lastChangeSlope = slope1;
+            return false;
+        }
 
+        if ((trace.lastChangeSlope < slope1) && (slope1 > slope2)) {
+            trace.lastChangeSlope = slope1;
+            return true;
+        }
+
+        if ((trace.lastChangeSlope > slope1) && (slope1 < slope2)) {
+            trace.lastChangeSlope = slope1;
+            return true;
+        }
+
+        trace.lastChangeSlope = slope1;
         return false;
     },
 

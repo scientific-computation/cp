@@ -39,7 +39,7 @@ window.initialSettings = {
     stationary_max: 2,
 
     /* inflection_max: the maximal number of inflection points within two zero points */
-    inflection_max: 1,
+    inflection_max: 2,
 
     /* m */
     m: Math.pow(window.constants.h_reduced, 2) / 2,
@@ -210,14 +210,15 @@ window.calculate = function(initialSettings, tPrecision) {
         var traceNumericRaw = traces['trace-e' + n + '-numeric'];
 
         /* solve the schrödinger equation */
-        traceNumericRaw.up          = n % 2 === 0 ? true : false;
-        traceNumericRaw.slope       = traceNumericRaw.up ? 'up' : 'down';
-        traceNumericRaw.changeSlope = traceNumericRaw.up ? 'positive' : 'negative';
-        initialSettings.energyLevel = n;
-        traceNumericRaw.energyLevel = initialSettings.energyLevel;
+        traceNumericRaw.up              = n % 2 === 0 ? true : false;
+        traceNumericRaw.slope           = traceNumericRaw.up ? 'up' : 'down';
+        traceNumericRaw.changeSlope     = traceNumericRaw.up ? 'positive' : 'negative';
+        traceNumericRaw.lastChangeSlope = 0;
+        initialSettings.energyLevel     = n;
+        traceNumericRaw.energyLevel     = initialSettings.energyLevel;
         if (n === 0) {
             var result = {
-                'E_guess': .45,
+                'E_guess': .25,
                 'percent': 100
             };
         } else {
