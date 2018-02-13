@@ -32,22 +32,15 @@ window.numericalAnalysis = {
     numerovHelper: function (trace, initialSettings) {
 
         /* build point objects */
-        var p_i_1 = {
+        var p_i_1;
+        var p_i = {
             x: initialSettings.x,
             y: initialSettings.y_i_1
         };
-        var p_i = {
+        var p_i1 = {
             x: initialSettings.x + initialSettings.d_x,
             y: initialSettings.y_i
         };
-        var p_i1 = {
-            x: initialSettings.x + 2 * initialSettings.d_x,
-            y: 0
-        };
-
-        /* calculate the y₋₁ point */
-        trace.x.push(p_i_1.x);
-        trace.y.push(p_i_1.y);
 
         /* calculate the y₀ point */
         trace.x.push(p_i.x);
@@ -58,6 +51,25 @@ window.numericalAnalysis = {
         var stationaryCounter = 0;
         var inflectionCounter = 0;
         do {
+
+            /* save calculated value to current trace */
+            trace.x.push(p_i1.x);
+            trace.y.push(p_i1.y);
+
+            /* rotate p₋₁, p₀ and p₊₁ */
+            p_i_1 = {
+                x: p_i.x,
+                y: p_i.y
+            };
+            p_i = {
+                x: p_i1.x,
+                y: p_i1.y
+            };
+            p_i1 = {
+                x: p_i.x + initialSettings.d_x,
+                y: 0
+            };
+
             /* calculate y₊₁ */
             p_i1.y = window.numericalAnalysis.numerov(p_i_1, p_i, p_i1, initialSettings);
 
@@ -111,23 +123,6 @@ window.numericalAnalysis = {
                 break;
             }
 
-            /* save calculated value to current trace */
-            trace.x.push(p_i1.x);
-            trace.y.push(p_i1.y);
-
-            /* set new p₋₁, p₀ and p₊₁ */
-            p_i_1 = {
-                x: p_i.x,
-                y: p_i.y
-            };
-            p_i = {
-                x: p_i1.x,
-                y: p_i1.y
-            };
-            p_i1 = {
-                x: p_i.x + initialSettings.d_x,
-                y: 0
-            };
         } while (true);
 
         var E_guess = window.initialSettings.energyStart / (8 * 2 / (p_i.x + 8));
