@@ -31,7 +31,7 @@ window.numericalAnalysis = {
      */
     numerovHelper: function (trace, initialSettings) {
 
-        /* build coordinates object */
+        /* create coordinates object */
         var coordinates = {
             x_i_1: initialSettings.x,
             x_i: initialSettings.x + initialSettings.d_x,
@@ -50,23 +50,32 @@ window.numericalAnalysis = {
 
         /* calculate the y₊₁ points */
         var zeroCounter = -1;
+        var stationaryCounter = 0;
         var inflectionCounter = 0;
-        var energyLowerThanAllowed = false;
         do {
             /* calculate y₊₁ */
             var y_i1 = window.numericalAnalysis.numerov(coordinates, initialSettings);
 
+
+
             /* checks if the current point is a zero point (differs in sign) */
             if (window.numericalAnalysis.algebraicSignHasChanged(coordinates.y_i, y_i1)) {
                 zeroCounter++;
+                stationaryCounter = 0;
                 inflectionCounter = 0;
                 console.log('zero point found.', coordinates.x_i_1 + '/' + coordinates.y_i_1, coordinates.x_i + '/' + coordinates.y_i, coordinates.x_i1 + '/' + y_i1);
             }
 
             /* checks if the current point is a stationary point */
             if (window.numericalAnalysis.isStationaryPoint(trace, coordinates.y_i, y_i1)) {
+                stationaryCounter++;
+                console.log('stationary point found (' + (trace.slope === 'up' ? 'min' : 'max') + ').', stationaryCounter, coordinates.x_i + '/' + coordinates.y_i);
+            }
+
+            /* checks if the current point is an inflection point */
+            if (window.numericalAnalysis.isInflectionPoint()) {
                 inflectionCounter++;
-                console.log('stationary point found (' + (trace.slope === 'up' ? 'min' : 'max') + ').', inflectionCounter, coordinates.x_i + '/' + coordinates.y_i);
+                console.log('inflection point found.');
             }
 
             /* max zero points reached */
@@ -75,9 +84,15 @@ window.numericalAnalysis = {
                 break;
             }
 
+            /* maximal number of stationary points between two zero points reached */
+            if (stationaryCounter >= initialSettings.stationary_max) {
+                console.warn('To much stationary points found!');
+                break;
+            }
+
             /* maximal number of inflection points between two zero points reached */
             if (inflectionCounter >= initialSettings.inflection_max) {
-                console.warn('To much inflections!');
+                console.warn('To much inflection points found!');
                 break;
             }
 
@@ -263,6 +278,19 @@ window.numericalAnalysis = {
                 return false;
             }
         }
+
+        return false;
+    },
+
+    /**
+     * Detects an inflection point.
+     *
+     * @param p_i_1
+     * @param p_i
+     * @param p_i1
+     */
+    isInflectionPoint: function (p_i_1, p_i, p_i1) {
+
 
         return false;
     },

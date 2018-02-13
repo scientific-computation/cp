@@ -35,8 +35,11 @@ window.initialSettings = {
     /* x_max: maximal x */
     x_max: 8,
 
-    /* inflection_max: the maximal number of inflections within two zero points */
-    inflection_max: 2,
+    /* stationary_max: the maximal number of stationary points within two zero points */
+    stationary_max: 2,
+
+    /* inflection_max: the maximal number of inflection points within two zero points */
+    inflection_max: 1,
 
     /* m */
     m: Math.pow(window.constants.h_reduced, 2) / 2,
@@ -209,6 +212,7 @@ window.calculate = function(initialSettings, tPrecision) {
         /* solve the schrödinger equation */
         traceNumericRaw.up          = n % 2 === 0 ? true : false;
         traceNumericRaw.slope       = traceNumericRaw.up ? 'up' : 'down';
+        traceNumericRaw.changeSlope = traceNumericRaw.up ? 'positive' : 'negative';
         initialSettings.energyLevel = n;
         traceNumericRaw.energyLevel = initialSettings.energyLevel;
         if (n === 0) {
