@@ -92,13 +92,6 @@ window.initialSettings = {
 window.initialSettings.constants   = window.constants;
 window.initialSettings.omega       = Math.sqrt(window.initialSettings.k / window.initialSettings.m);
 
-// console.log('y_i', window.initialSettings.y_i);
-// console.log('x', window.initialSettings.x);
-// console.log('d_x', window.initialSettings.d_x);
-// var q = window.numericalAnalysis.calculateQ0(window.initialSettings.energyStart, window.initialSettings.x, initialSettings);
-// console.log('Q', q);
-// console.log('d_y', Math.exp(q * window.initialSettings.d_x));
-
 /* plotly id */
 window.idDivPlotly = 'graph-quantum-mechanics-harmonic';
 
@@ -207,8 +200,6 @@ window.calculate = function(initialSettings, tPrecision) {
         });
     }
 
-    // n = 0: y0 -8 7.107932950961829e-8
-
     /* Calculates the first three schrödinger equations with numerov algorithm and normalize it */
     for (var n = 0; n <= 2; n++) {
         console.log('start energy level ' + n);
@@ -222,7 +213,7 @@ window.calculate = function(initialSettings, tPrecision) {
         traceNumericRaw.energyLevel = initialSettings.energyLevel;
         if (n === 0) {
             var result = {
-                'E_guess': .49,
+                'E_guess': .2,
                 'percent': 100
             };
         } else {
@@ -245,6 +236,8 @@ window.calculate = function(initialSettings, tPrecision) {
                 traceNumericRaw.y = [];
 
                 var result = window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
+
+                console.log('result', result);
             }
         }
 

@@ -71,21 +71,25 @@ window.numericalAnalysis = {
 
             /* max zero points reached */
             if (zeroCounter >= initialSettings.energyLevel) {
+                console.log('Max zero points found.');
                 break;
             }
 
             /* maximal number of inflection points between two zero points reached */
             if (inflectionCounter >= initialSettings.inflection_max) {
+                console.warn('To much inflections!');
                 break;
             }
 
             /* y to high -> the energy is maybe less than physically allowed */
             if (y_i1 > initialSettings.y_max) {
+                console.warn('Y to high!');
                 break;
             }
 
             /* only calculate the wave function between the given bounds */
-            if (coordinates.x_i1 > initialSettings.x_max) {
+            if (coordinates.x_i1 > 2 * initialSettings.x_max) {
+                console.warn('X to high!');
                 break;
             }
 
@@ -107,12 +111,11 @@ window.numericalAnalysis = {
         var percent = 100 * Math.abs(1 - (coordinates.x_i + 8) / (8 * 2));
 
         return {
-            'E':                      window.initialSettings.energyStart,
-            'E_guess':                E_guess,//(E_guess - window.initialSettings.energyStart) * percent / 100 + window.initialSettings.energyStart,
-            'x_expected':             8,
-            'x_pivot':                coordinates.x_i,
-            'percent':                percent,
-            'energyLowerThanAllowed': energyLowerThanAllowed
+            'E':          window.initialSettings.energyStart,
+            'E_guess':    E_guess,//(E_guess - window.initialSettings.energyStart) * percent / 100 + window.initialSettings.energyStart,
+            'x_expected': 8,
+            'x_pivot':    coordinates.x_i,
+            'percent':    percent
         };
     },
 
