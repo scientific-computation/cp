@@ -215,26 +215,26 @@ window.calculate = function(initialSettings, tPrecision) {
         initialSettings.energyLevel     = n;
         traceNumericRaw.energyLevel     = initialSettings.energyLevel;
 
-        var count = 1;
-        if (n === 0) {
-            var result = {
-                'E_guess': .49,
-                'percent': 100
-            };
-
-            //count = 4;
-        } else {
+        // var count = 1;
+        // if (n === 0) {
+        //     var result = {
+        //         'E_guess': .49,
+        //         'percent': 100
+        //     };
+        //
+        //     //count = 4;
+        // } else {
             var result = {
                 'E_guess': window.numericalAnalysis.calculateEnergy(n, initialSettings),
                 'percent': 100
             };
-        }
+        // }
 
-        /* calculate the energy level */
-        for (var i = 0; i < count; i++) {
-            console.log('start energy level ' + n);
-
-            if (result.percent > 0.5) {
+        // /* calculate the energy level */
+        // for (var i = 0; i < count; i++) {
+        //     console.log('start energy level ' + n);
+        //
+        //     if (result.percent > 0.5) {
                 initialSettings.energyStart = result['E_guess'];
                 traceNumericRaw.energyStart = initialSettings.energyStart;
 
@@ -247,8 +247,8 @@ window.calculate = function(initialSettings, tPrecision) {
                 result = window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
 
                 console.log('result', result);
-            }
-        }
+        //     }
+        // }
 
         /* normalize it */
         traces['trace-e' + n + '-numeric-normalized'].x = traceNumericRaw.x.slice();
