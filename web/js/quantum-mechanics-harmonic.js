@@ -190,7 +190,7 @@ window.calculate = function(initialSettings, tPrecision) {
         traces['trace-e' + n + '-analytic'] = window.helper.getDefaultTraceConfig({
             id: 'trace-e' + n + '-analytic',
             name: 'E' + window.helper.getUnderscoreNumber(n) + ' (analytic)'
-        }, 2);
+        }, 2, 0, 'dot');
     }
     for (var n = 0; n <= 2; n++) {
         traces['trace-e' + n + '-numeric'] = window.helper.getDefaultTraceConfig({
@@ -205,8 +205,6 @@ window.calculate = function(initialSettings, tPrecision) {
 
     /* Calculates the first three schrödinger equations with numerov algorithm and normalize it */
     for (var n = 0; n <= 2; n++) {
-        console.log('start energy level ' + n);
-
         var traceNumericRaw = traces['trace-e' + n + '-numeric'];
 
         /* solve the schrödinger equation */
@@ -216,11 +214,15 @@ window.calculate = function(initialSettings, tPrecision) {
         traceNumericRaw.lastChangeSlope = 0;
         initialSettings.energyLevel     = n;
         traceNumericRaw.energyLevel     = initialSettings.energyLevel;
+
+        var count = 1;
         if (n === 0) {
             var result = {
-                'E_guess': .25,
+                'E_guess': .49,
                 'percent': 100
             };
+
+            //count = 4;
         } else {
             var result = {
                 'E_guess': window.numericalAnalysis.calculateEnergy(n, initialSettings),
@@ -229,7 +231,9 @@ window.calculate = function(initialSettings, tPrecision) {
         }
 
         /* calculate the energy level */
-        for (var i = 0; i < 1; i++) {
+        for (var i = 0; i < count; i++) {
+            console.log('start energy level ' + n);
+
             if (result.percent > 0.5) {
                 initialSettings.energyStart = result['E_guess'];
                 traceNumericRaw.energyStart = initialSettings.energyStart;
@@ -240,7 +244,7 @@ window.calculate = function(initialSettings, tPrecision) {
                 traceNumericRaw.x = [];
                 traceNumericRaw.y = [];
 
-                var result = window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
+                result = window.numericalAnalysis.numerovHelper(traceNumericRaw, initialSettings);
 
                 console.log('result', result);
             }

@@ -48,8 +48,9 @@ window.numericalAnalysis = {
 
         /* calculate the y₊₁ points */
         var zeroCounter = -1;
-        var stationaryCounter = 0;
-        var inflectionCounter = 0;
+        var stationaryCounter  = 0;
+        var inflectionCounter  = 0;
+        var divergenceDetected = false;
         do {
 
             /* save calculated value to current trace */
@@ -103,12 +104,14 @@ window.numericalAnalysis = {
             /* maximal number of stationary points between two zero points reached */
             if (stationaryCounter >= initialSettings.stationary_max) {
                 console.warn('To much stationary points found!');
+                divergenceDetected = true;
                 break;
             }
 
             /* maximal number of inflection points between two zero points reached */
             if (inflectionCounter >= initialSettings.inflection_max) {
                 console.warn('To much inflection points found!');
+                divergenceDetected = true;
                 break;
             }
 
@@ -126,15 +129,30 @@ window.numericalAnalysis = {
 
         } while (true);
 
-        var E_guess = window.initialSettings.energyStart / (8 * 2 / (p_i.x + 8));
-        var percent = 100 * Math.abs(1 - (p_i.x + 8) / (8 * 2));
+        var domainWidth     = initialSettings.x_max - initialSettings.x;
+        var divergenceFactor = divergenceDetected ? p_i.y / domainWidth : 0;
+
+        var xOver  = p_i1.x - initialSettings.x_max;
+        var xPivot = domainWidth + xOver;
+
+        if (divergenceDetected) {
+            var E_guess = window.initialSettings.energyStart * (10 * divergenceFactor + 1);
+            var percent = 100;
+        } else {
+            var percent = 100 * xPivot / domainWidth;
+            var E_guess = ((percent - 100) / 4 / 100 + 1) * window.initialSettings.energyStart;
+        }
 
         return {
-            'E':          window.initialSettings.energyStart,
-            'E_guess':    E_guess,//(E_guess - window.initialSettings.energyStart) * percent / 100 + window.initialSettings.energyStart,
-            'x_expected': 8,
-            'x_pivot':    p_i.x,
-            'percent':    percent
+            'E':                  window.initialSettings.energyStart,
+            'E_guess':            E_guess,
+            'x_expected':         initialSettings.x_max,
+            'x_pivot':            xPivot,
+            'x_over':             xOver,
+            'x':                  p_i1.x,
+            'percent':            percent,
+            'divergenceFactor':   divergenceFactor,
+            'divergenceDetected': divergenceDetected
         };
     },
 
@@ -292,6 +310,11 @@ window.numericalAnalysis = {
     isInflectionPoint: function (p_i_1, p_i, p_i1, trace) {
         var slope1 = (p_i.y - p_i_1.y) / (p_i.x - p_i_1.x);
         var slope2 = (p_i1.y - p_i.y) / (p_i1.x - p_i.x);
+
+        if (p_i.x < -1) {
+            trace.lastChangeSlope = slope1;
+            return false;
+        }
 
         if (trace.lastChangeSlope === 0) {
             trace.lastChangeSlope = slope1;

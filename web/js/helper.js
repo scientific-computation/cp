@@ -5,7 +5,7 @@ window.helper = {
      * @version 1.0 (2018-01-30)
      * @author  Björn Hempel <bjoern@hempel.li>
      */
-    getDefaultTraceConfig: function(config, traceWidthAdd, traceOpacityAdd) {
+    getDefaultTraceConfig: function(config, traceWidthAdd, traceOpacityAdd, traceDash) {
         var defaultTraceOpacity = 1.0;
         var defaultTraceWidth   = 1;
 
@@ -21,12 +21,16 @@ window.helper = {
             type: 'scatter',
             opacity: defaultTraceOpacity,
             line: {
-                width: defaultTraceWidth
+                width: defaultTraceWidth,
             }
         };
 
         if (traceWidthAdd) {
             defaultTraceConfig.line.width += traceWidthAdd;
+        }
+
+        if (traceDash) {
+            defaultTraceConfig.line.dash = traceDash;
         }
 
         if (traceOpacityAdd) {
