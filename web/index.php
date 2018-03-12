@@ -8,8 +8,15 @@
         <?php include('includes/header.php'); ?>
     </head>
     <body>
+        <h1>Classical mechanics</h1>
         <ul>
             <li><a href="/oscillator-harmonic-damped.html">Harmonic damped oscillator</a></li>
+            <li><a href="/projectile-motion.html">Projectile motion</a></li>
+        </ul>
+        <h1>Quantum mechanics</h1>
+        <ul>
+            <li><a href="/quantum-mechanics.html">Quantum mechanics I (Particle in a box)</a></li>
+            <li><a href="/quantum-mechanics-harmonic.html">Quantum mechanics II (quantum harmonic oscillator)</a></li>
         </ul>
     </body>
 </html>

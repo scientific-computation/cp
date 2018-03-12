@@ -1,3 +1,6 @@
+AddCharset UTF-8 .html
+AddCharset UTF-8 .js
+
 RewriteEngine On
 RewriteRule ^(.*)\.html$ $1.php [L]
 

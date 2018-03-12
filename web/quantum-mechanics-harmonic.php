@@ -2,13 +2,13 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Computational Science - projectile motion</title>
+        <title>Computational Science - quantum mechanics harmonic potential</title>
 
         <!-- include the header -->
         <?php include('includes/header.php'); ?>
 
         <!-- load own js file -->
-        <script src="/js/projectile-motion.js"></script>
+        <script src="/js/quantum-mechanics-harmonic.js"></script>
 
         <style>
         .MathJax:focus, .mjx-chtml:focus, .MathJax_SVG:focus {
@@ -18,27 +18,21 @@
     </head>
     <body>
         <div class="content">
-            <h1>Projectile motion</h1>
-            <h2>equation of motions:</h2>
-            <p>
+            <h1>Quantum mechanics - quantum harmonic oscillator</h1>
+            <!--h2>equations:</h2-->
+            <!--p>
                 <table border="0" cellpadding="0" cellspacing="0" class="equations">
                     <tr>
-                        <td><strong>Friction:</strong></td><td>\(\vec F_R = - \gamma \cdot | \vec \upsilon | \cdot \vec \upsilon\)</td>
+                        <td><strong>Schrödinger equation:</strong></td><td>\(\left( - {\hbar^2 \over 2 \cdot m} \cdot {d^2 \over d x^2} + V(x)\right)\lvert\psi(x)\rangle = E\lvert\psi(x)\rangle \)</td>
                     </tr>
                     <tr>
-                        <td><strong>Differential equation:</strong></td><td>\(\ddot{x}(t) = {-{\gamma \over m} \cdot \sqrt{v^2_{x}(t) + v^2_{y}(t)} \cdot v_{x}(t)}\)</td>
-                    </tr>
-                    <tr>
-                        <td></td><td>\(\ddot{y}(t) = {-{\gamma \over m} \cdot \sqrt{v^2_{x}(t) + v^2_{y}(t)} \cdot v_{y}(t) - g}\)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Analytic:</strong></td><td>\(y(x) = -{g \over 2 \cdot v_0^2 \cdot cos^2(\alpha)} \cdot (x - x_0)^2 + tan(\alpha) \cdot (x - x_0) + y_0\)</td>
+                        <td><strong>Expectation value:</strong></td><td>\(\langle H\rangle = \langle\psi(x)\rvert\hat{H}\lvert\psi(x)\rangle \)</td>
                     </tr>
                 </table>
-            </p>
+            </p-->
 
             <p>
-                <form id="equation-settings">
+                <form id="equation-settings" style="visibility: hidden; height: 0px;">
                     <table border="0" cellpadding="0" cellspacing="0" class="settings">
                         <tr>
                             <td>\(\Delta t\)</td>
@@ -126,6 +120,6 @@
                 </form>
             </p>
         </div>
-        <div id="graph-oscillator-harmonic-damped" class="graph"></div>
+        <div id="graph-quantum-mechanics-harmonic" class="graph"></div>
     </body>
 </html>
